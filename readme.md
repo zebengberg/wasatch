@@ -1,3 +1,5 @@
 # school-projects
 
-Various projects and simulations from engineering and computer science classes.
+Projects and simulations from Wasatch Academy engineering and computer science classes.
+
+- [Balls bouncing and colliding](https://zebengberg.github.io/javascript/collision.html]
