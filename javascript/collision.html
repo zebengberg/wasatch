@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html>
   <head>
     <style type="text/css">
       canvas {border: 5px solid black}
       body {margin: 0}
     </style>
   </head>
+  <body>
+    Number of balls: <input type='number' id='nBalls' value='15'></input>
+    Ball radius: <input type='number' id='radius' value='50'></input>
+    Ball squishiness: <input type='number' id='squish' value='30'></input>
+    Ball speed: <input type='number' id='speed' value='2'></input>
+    <button type='button' onclick='init()'> Reset </button>
+    <canvas id='myCanvas' tabindex='1'></canvas>
+    <script src='collision.js'></script>
+  </body>
 </html>
-
-<body>
-  <canvas id='myCanvas' tabindex='1'></canvas>
-  <script src='collision.js''></script>
-</body>

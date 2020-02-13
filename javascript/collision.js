@@ -3,25 +3,39 @@
 // Getting html elements.
 let canvas = document.getElementById('myCanvas');
 canvas.width = window.innerWidth - 10;
-canvas.height = window.innerHeight - 10;
+canvas.height = window.innerHeight - 40;
 var c = canvas.getContext('2d');
 
-const radius = 50;
-const squish = 1;  // constant that governs how squishy each ball is
-const speed = 5;  // parameter used in initalizing ball velocity vector
-const nBalls = 8;
 
 class Ball {
-  constructor(x = Math.random() * (canvas.width - 2 * radius) + radius,
-              y = Math.random() * (canvas.height - 2 * radius) + radius,
-              dx = speed * Math.random(),
-              dy = speed * Math.random()) {
+  constructor(x = null, y = null, dx = null, dy = null) {
     this.setRandomColor();
-    this.r = radius;
-    this.x = x;
-    this.y = y;
-    this.dx = dx;
-    this.dy = dy;
+    this.r = Ball.radius;
+
+    if (x === null) {
+      this.x = Math.random() * (canvas.width - 2 * this.r) + this.r;
+    } else {
+      this.x = x;
+    }
+
+    if (y === null) {
+      this.y = Math.random() * (canvas.height - 2 * this.r) + this.r;
+    } else {
+      this.y = y;
+    }
+
+    if (dx === null) {
+      this.dx = Ball.speed * Math.random();
+    } else {
+      this.dx = dx;
+    }
+
+    if (dy === null) {
+      this.dy = Ball.speed * Math.random();
+    } else {
+      this.dy = dy;
+    }
+
     this.hasBeenDrawn = false;
   }
 
@@ -92,11 +106,23 @@ class Ball {
   }
 }
 
+// two global variables
+let nBalls, balls;
 
-balls = [];
-for (var i = 0; i < nBalls; i++) {
-  balls.push(new Ball());
+function init() {
+  // static class variables
+  Ball.radius = Number(document.getElementById('radius').value);
+  Ball.squish = Number(document.getElementById('squish').value);
+  Ball.speed = Number(document.getElementById('speed').value);
+  // populating array of Ball objects
+  nBalls = Number(document.getElementById('nBalls').value);
+  balls = [];
+  for (let i = 0; i < nBalls; i++) {
+    balls.push(new Ball());
+  }
 }
+
+init();
 
 
 function update() {
@@ -106,9 +132,10 @@ function update() {
     ball.hasBeenDrawn = false;
     // Drawing all balls once now.
     ball.draw();
+
   }
-  for (var i = 0; i < balls.length; i++) {
-    for (var j = i + 1; j < balls.length; j++) {
+  for (var i = 0; i < nBalls; i++) {
+    for (var j = i + 1; j < nBalls; j++) {
       ball1 = balls[i];
       ball2 = balls[j];
       let dist = Ball.getDistance(ball1, ball2);
@@ -120,12 +147,17 @@ function update() {
         let oldEnergy = ball1.getEnergy() + ball2.getEnergy();
         let dx = ball1.x - ball2.x;
         let dy = ball1.y - ball2.y;
-        // This is where all the physics happens; change dx inversely proportionally
-        // to the distance between center of the balls.
-        ball1.dx += squish * dx / dist;
-        ball2.dx -= squish * dx / dist;
-        ball1.dy += squish * dy / dist;
-        ball2.dy -= squish * dy / dist;
+        // This is where all the physics happens; change ball.dx inversely
+        // proportionally to the distance between center of the balls.
+        // Mathematically, we just need a function which grows to infinity as
+        // dx approaches 0.
+        ball1.dx += Ball.squish * dx / (dist * dist);
+        ball2.dx -= Ball.squish * dx / (dist * dist);
+        ball1.dy += Ball.squish * dy / (dist * dist);
+        ball2.dy -= Ball.squish * dy / (dist * dist);
+        console.log(ball1.dx, ball1.dy);
+        console.log(Ball.squish * dx / (dist * dist));
+        console.log(Ball.squish);
 
         // Total kinetic energy should be preserved.
         let newEnergy = ball1.getEnergy() + ball2.getEnergy();
