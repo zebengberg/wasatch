@@ -109,7 +109,7 @@ class Ball {
 // two global variables
 let nBalls, balls;
 
-function init() {
+function reset() {
   // static class variables
   Ball.radius = Number(document.getElementById('radius').value);
   Ball.squish = Number(document.getElementById('squish').value);
@@ -122,7 +122,7 @@ function init() {
   }
 }
 
-init();
+reset();
 
 
 function update() {
