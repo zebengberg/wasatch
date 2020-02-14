@@ -1,10 +1,12 @@
 // A program for Choezin's theremin. Her theremin has two ultrasonic
 // distance sensors and two speakers.
 
-const int leftTrigPin = 1;
-const int leftEchoPin = 2;
-const int rightTrigPin = 3;
-const int rightEchoPin = 4;
+const int leftTrigPin = 8;
+const int leftEchoPin = 9;
+const int leftSpeakerPin = 10;
+const int rightTrigPin = 7;
+const int rightEchoPin = 6;
+const int rightSpeakerPin = 11;
 
 const int sizeOfScale = 30;
 unsigned int scale[sizeOfScale];  // uninitialized array
