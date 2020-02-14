@@ -4,15 +4,17 @@
 const int leftTrigPin = 8;
 const int leftEchoPin = 9;
 const int leftSpeakerPin = 10;
+
 const int rightTrigPin = 7;
 const int rightEchoPin = 6;
 const int rightSpeakerPin = 11;
 
-const int sizeOfScale = 30;
+const int sizeOfScale = 20;
 unsigned int scale[sizeOfScale];  // uninitialized array
 
 
 struct Theremin {
+  String name;
   int trigPin;
   int echoPin;
   int speakerPin;
@@ -21,6 +23,7 @@ struct Theremin {
     pinMode(trigPin, OUTPUT);
     pinMode(echoPin, INPUT);
     pinMode(speakerPin, OUTPUT);
+    Serial.println("Initialized theremin.");
   }
   
   // Returns the distance in cm
@@ -40,27 +43,26 @@ struct Theremin {
       }
     }
     // Converting to approximate cm
-    return duration / 150;
+    unsigned int cm = duration / 50;
+    Serial.print("Distance in cm: ");
+    Serial.println(cm);
+    return cm;
   }
 
   void getDistAndPlay() {
     unsigned int d = getDist();
-    if (d < 100) {  // 1 meter max
-      // if distance less than 5, play nothing
-      if (d < 5) {
-        pause();
-      }
-      else {
-        int note = map(d, 5, 100, 0, sizeOfScale);
-        playFreq(scale[note]);
-      }
+    // if distance greater than 50, play nothing
+    if (d > 50) {
+      pause();
     } else {
-      int note = random(0, sizeOfScale);
+      int note = map(d, 0, 50, sizeOfScale, 0);
       playFreq(scale[note]);
     }
   }
 
   void playFreq(int freq) {
+    Serial.print("Playing frequency: ");
+    Serial.println(freq);
     tone(speakerPin, freq);
   }
 
@@ -69,21 +71,24 @@ struct Theremin {
   }
 };
 
-Theremin left {leftTrigPin, leftEchoPin};
-Theremin right {rightTrigPin, rightEchoPin};
+Theremin left {"left", leftTrigPin, leftEchoPin, leftSpeakerPin};
+Theremin right {"right", rightTrigPin, rightEchoPin, rightSpeakerPin};
 
 
 void setup() {
+  // For debugging
+  Serial.begin(9600);
+  
   // Building up the scale of notes to be used for playing music
   unsigned int baseFreq = 110;
   // an array of notes mod 12
-  float blues[6] = {0, 3, 5, 6, 7, 10};
+  float penta[5] = {0, 2, 4, 7, 9};
   
   for (int i = 0; i < sizeOfScale; i++) {
-    int q = i / 6;  // quotient
-    int r = i % 6;  // remainder
+    int q = i / 5;  // quotient
+    int r = i % 5;  // remainder
     // populating the array; float type will be cast back to unsigned int
-    scale[i] = baseFreq * q + float(baseFreq) * pow(2.0, blues[r] / 12.0);
+    scale[i] = baseFreq * q + float(baseFreq) * pow(2.0, penta[r] / 12.0);
   }
 
   // Initializing pins
@@ -93,6 +98,6 @@ void setup() {
 
 void loop() {
   left.getDistAndPlay();
-  right.getDistAndPlay();
-  delay(100);
+  //right.getDistAndPlay();
+  delay(1000);
 }
