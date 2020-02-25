@@ -3,14 +3,20 @@
 // Getting html elements.
 let canvas = document.getElementById('myCanvas');
 canvas.width = window.innerWidth - 10;
-canvas.height = window.innerHeight - 40;
+canvas.height = window.innerHeight - 10;
 var c = canvas.getContext('2d');
 
 
 class Ball {
-  constructor(x = null, y = null, dx = null, dy = null) {
+  constructor(r = null, x = null, y = null, dx = null, dy = null) {
     this.setRandomColor();
-    this.r = Ball.radius;
+
+    if (r === null) {
+      this.r = Ball.radius();
+    } else {
+      this.r = r;
+    }
+    this.mass = this.r * this.r;  // mass proportional to r^2
 
     if (x === null) {
       this.x = Math.random() * (canvas.width - 2 * this.r) + this.r;
@@ -63,9 +69,8 @@ class Ball {
     c.fill();
   }
 
-  // Get kinetic energy and get speed.
-  getEnergy() { return this.dx * this.dx + this.dy * this.dy; }
-  getSpeed() { return Math.sqrt(this.getEnergy()); }
+  // Get kinetic energy.
+  getEnergy() { return this.mass * (this.dx * this.dx + this.dy * this.dy); }
 
   // Get distance between two balls
   static getDistance(ball1, ball2) {
@@ -96,7 +101,7 @@ class Ball {
       ball1.hasBeenDrawn = true;
     }
 
-    // Now drawing the line segment to the intersection.
+    // Now drawing the line segment coincident with the intersection.
     c.beginPath();
     c.moveTo(x1, y1);
     c.lineTo(x2, y2);
@@ -109,30 +114,42 @@ class Ball {
 // two global variables
 let nBalls, balls;
 
-function reset() {
+function getUserInput() {
   // static class variables
-  Ball.radius = Number(document.getElementById('radius').value);
   Ball.squish = Number(document.getElementById('squish').value);
   Ball.speed = Number(document.getElementById('speed').value);
   // populating array of Ball objects
   nBalls = Number(document.getElementById('nBalls').value);
+  if (document.getElementById('radius').checked) {
+    Ball.radius = function() { return 50; }
+  } else {
+    Ball.radius = function() { return 50 * Math.random() + 5; }
+  }
+
   balls = [];
   for (let i = 0; i < nBalls; i++) {
     balls.push(new Ball());
   }
 }
 
-reset();
+getUserInput();
 
 
 function update() {
+  // For nerding out and considering the distribution of particle kinetic energies.
+  let energies = balls.map(ball => ball.getEnergy());
+  console.log('min: ' + Math.min(...energies));
+  console.log('mean: ' + energies.reduce((a, b) => a + b, 0) / nBalls);
+  console.log('max: ' + Math.max(...energies));
+  console.log('');
+
+
   c.clearRect(0, 0, canvas.width, canvas.height);
   for (let ball of balls) {
     ball.updatePosition();
     ball.hasBeenDrawn = false;
     // Drawing all balls once now.
     ball.draw();
-
   }
   for (var i = 0; i < nBalls; i++) {
     for (var j = i + 1; j < nBalls; j++) {
@@ -151,13 +168,11 @@ function update() {
         // proportionally to the distance between center of the balls.
         // Mathematically, we just need a function which grows to infinity as
         // dx approaches 0.
-        ball1.dx += Ball.squish * dx / (dist * dist);
-        ball2.dx -= Ball.squish * dx / (dist * dist);
-        ball1.dy += Ball.squish * dy / (dist * dist);
-        ball2.dy -= Ball.squish * dy / (dist * dist);
-        console.log(ball1.dx, ball1.dy);
-        console.log(Ball.squish * dx / (dist * dist));
-        console.log(Ball.squish);
+        // Scale by mass of the other ball. The constant 10 is arbitrary.
+        ball1.dx += Ball.squish * ball2.mass * dx / (100 * dist * dist);
+        ball2.dx -= Ball.squish * ball1.mass * dx / (100 * dist * dist);
+        ball1.dy += Ball.squish * ball2.mass * dy / (100 * dist * dist);
+        ball2.dy -= Ball.squish * ball1.mass * dy / (100 * dist * dist);
 
         // Total kinetic energy should be preserved.
         let newEnergy = ball1.getEnergy() + ball2.getEnergy();
