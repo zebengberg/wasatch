@@ -121,9 +121,9 @@ function getUserInput() {
   // populating array of Ball objects
   nBalls = Number(document.getElementById('nBalls').value);
   if (document.getElementById('radius').checked) {
-    Ball.radius = function() { return 50; }
+    Ball.radius = function() { return 50; };
   } else {
-    Ball.radius = function() { return 50 * Math.random() + 5; }
+    Ball.radius = function() { return 50 * Math.random() + 5; };
   }
 
   balls = [];
