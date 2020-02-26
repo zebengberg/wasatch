@@ -12,14 +12,14 @@ var c = canvas.getContext('2d');
 class Polygon {
   constructor() {
     this.setRandomColor();
-    this.n = 5;
+    this.n = 7;
     this.r = 100;
     this.x = this.x = Math.random() * (canvas.width - 2 * this.r) + this.r;
     this.y = this.y = Math.random() * (canvas.height - 2 * this.r) + this.r;
-    this.dx = Math.random();
-    this.dy = Math.random();
+    this.dx = 8 * Math.random() - 4;
+    this.dy = 8 * Math.random() - 4;
     this.theta = 2 * Math.PI * Math.random();
-    this.dtheta = 0.03 * Math.random();
+    this.dtheta = 0.04 * Math.random() - 0.02;
   }
 
   setRandomColor() {
@@ -35,14 +35,41 @@ class Polygon {
 
   // Update position and angular position.
   updatePosition() {
-    
+    let [a, b] = this.getLeftIntersections();
+    if (a) {
+      // Normal force proportional to length of intersection
+      this.dx += 0.01 * Math.abs(a - b);
+      drawLine(0, a, 0, b);
+    }
+
+    [a, b] = this.getRightIntersections();
+    if (a) {
+      // Normal force proportional to length of intersection
+      this.dx -= 0.01 * Math.abs(a - b);
+      drawLine(canvas.width, a, canvas.width, b);
+    }
+
+    [a, b] = this.getTopIntersections();
+    if (a) {
+      // Normal force proportional to length of intersection
+      this.dy += 0.01 * Math.abs(a - b);
+      drawLine(a, 0, b, 0);
+    }
+
+    [a, b] = this.getBottomIntersections();
+    if (a) {
+      // Normal force proportional to length of intersection
+      this.dy -= 0.01 * Math.abs(a - b);
+      drawLine(a, canvas.height, b, canvas.height);
+    }
+
     this.x += this.dx;
     this.y += this.dy;
     this.theta += this.dtheta;
   }
 
-  // Collide with vertical walls
-  verticalCollide() {
+  // Get intersection points with left wall
+  getLeftIntersections() {
     let intersection1 = null;
     let intersection2 = null;
     let x0 = this.getx();
@@ -59,7 +86,24 @@ class Polygon {
         } else {
           intersection2 = intersection;
         }
-      } else if (Math.sign(x0 - canvas.width) != Math.sign(x1 - canvas.width)) {
+      }
+      x0 = x1;
+      y0 = y1;
+    }
+    return [intersection1, intersection2];
+  }
+
+  // Get intersection points with right wall
+  getRightIntersections() {
+    let intersection1 = null;
+    let intersection2 = null;
+    let x0 = this.getx();
+    let y0 = this.gety();
+    for (let i = 0; i < this.n; i++) {
+      this.theta += 2 * Math.PI / this.n;
+      let x1 = this.getx();
+      let y1 = this.gety();
+      if (Math.sign(x0 - canvas.width) != Math.sign(x1 - canvas.width)) {
         // Found intersection with vertical wall at x = width
         let intersection = y0 + (canvas.width - x0) * (y0 - y1) / (x0 - x1);
         if (intersection1 === null) {
@@ -68,12 +112,14 @@ class Polygon {
           intersection2 = intersection;
         }
       }
+      x0 = x1;
+      y0 = y1;
     }
     return [intersection1, intersection2];
   }
 
-  // Collide with horizontal walls
-  horizontalCollide() {
+  // Get intersection points with top wall
+  getTopIntersections() {
     let intersection1 = null;
     let intersection2 = null;
     let x0 = this.getx();
@@ -90,8 +136,25 @@ class Polygon {
         } else {
           intersection2 = intersection;
         }
-      } else if (Math.sign(y0 - canvas.height) != Math.sign(y1 - canvas.height)) {
-        // Found intersection with vertical wall at x = width
+      }
+      x0 = x1;
+      y0 = y1;
+    }
+    return [intersection1, intersection2];
+  }
+
+  // Get intersection points with bottom wall
+  getBottomIntersections() {
+    let intersection1 = null;
+    let intersection2 = null;
+    let x0 = this.getx();
+    let y0 = this.gety();
+    for (let i = 0; i < this.n; i++) {
+      this.theta += 2 * Math.PI / this.n;
+      let x1 = this.getx();
+      let y1 = this.gety();
+      if (Math.sign(y0 - canvas.height) != Math.sign(y1 - canvas.height)) {
+        // Found intersection with horizontal wall at x = height
         let intersection = x0 + (canvas.height - y0) * (x0 - x1) / (y0 - y1);
         if (intersection1 === null) {
           intersection1 = intersection;
@@ -99,11 +162,11 @@ class Polygon {
           intersection2 = intersection;
         }
       }
+      x0 = x1;
+      y0 = y1;
     }
     return [intersection1, intersection2];
   }
-
-
 
   // Draw polygon centered at x, y.
   draw() {
@@ -127,8 +190,18 @@ polygon = new Polygon();
 
 function update() {
   c.clearRect(0, 0, canvas.width, canvas.height);
-  polygon.updatePosition();
   polygon.draw();
+  polygon.updatePosition();
+}
+
+// Draw a yellow line segment
+function drawLine(x1, y1, x2, y2) {
+  c.beginPath();
+  c.moveTo(x1, y1);
+  c.lineTo(x2, y2);
+  c.lineWidth = 15;
+  c.strokeStyle = 'yellow';
+  c.stroke();
 }
 
 // Useful for debugging
