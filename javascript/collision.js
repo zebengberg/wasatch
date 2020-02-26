@@ -161,7 +161,6 @@ function update() {
         Ball.collision(ball1, ball2);
 
         // Now applying normal forces.
-        let oldEnergy = ball1.getEnergy() + ball2.getEnergy();
         let dx = ball1.x - ball2.x;
         let dy = ball1.y - ball2.y;
         // This is where all the physics happens; change ball.dx inversely
@@ -173,14 +172,6 @@ function update() {
         ball2.dx -= Ball.squish * ball1.mass * dx / (100 * dist * dist);
         ball1.dy += Ball.squish * ball2.mass * dy / (100 * dist * dist);
         ball2.dy -= Ball.squish * ball1.mass * dy / (100 * dist * dist);
-
-        // Total kinetic energy should be preserved.
-        let newEnergy = ball1.getEnergy() + ball2.getEnergy();
-        let scale = Math.sqrt(oldEnergy / newEnergy);
-        ball1.dx *= scale;
-        ball1.dy *= scale;
-        ball2.dx *= scale;
-        ball2.dy *= scale;
       }
     }
   }
