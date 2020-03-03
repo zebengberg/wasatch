@@ -38,7 +38,6 @@ bool isMovingDown = true;
 void setup() {
   randomSeed(analogRead(0));
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
-  Serial.begin(9600);
 }
 
 void loop() {
@@ -59,8 +58,6 @@ void loop() {
 
 // Change state every minute or when button is pressed
 void setState() {
-  Serial.println(start_time);
-  Serial.println(millis() > 100 * 20);
   // Checking if a minute has elapsed 
   if (millis() > start_time + 1000UL * 60UL) {
     start_time = millis();
