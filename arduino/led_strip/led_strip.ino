@@ -68,6 +68,7 @@ void setState() {
   // Checking if button is pressed
   if (digitalRead(BUTTON_PIN)) {
     if (isButtonFirstPressed) {
+      start_time = millis();
       state++;
       state %= NUM_STATES;
       isButtonFirstPressed = false;
