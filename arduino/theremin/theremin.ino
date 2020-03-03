@@ -1,103 +1,77 @@
 // A program for Choezin's theremin. Her theremin has two ultrasonic
-// distance sensors and two speakers.
+// distance sensors and one speakers.
+// TODO: change volume of speaker based on the second distance sensor
 
-const int leftTrigPin = 8;
-const int leftEchoPin = 9;
-const int leftSpeakerPin = 10;
+#define LEFT_TRIG_PIN 8
+#define LEFT_ECHO_PIN 9
+#define RIGHT_TRIG_PIN 7
+#define RIGHT_ECHO_PIN 6
 
-const int rightTrigPin = 7;
-const int rightEchoPin = 6;
-const int rightSpeakerPin = 11;
-
-const int sizeOfScale = 20;
-unsigned int scale[sizeOfScale];  // uninitialized array
+#define SPEAKER_PIN 10
+#define LOW_FREQ 55.0
+#define HIGH_FREQ 440.0
 
 
 struct Theremin {
-  String name;
+  String myName;
   int trigPin;
   int echoPin;
   int speakerPin;
+  int freq;
   
   void init() {
     pinMode(trigPin, OUTPUT);
     pinMode(echoPin, INPUT);
     pinMode(speakerPin, OUTPUT);
+    freq = LOW_FREQ;
     Serial.println("Initialized theremin.");
   }
   
   // Returns the distance in cm
-  unsigned int getDist() {
+  float getDist() {
     // Have several readings to get more accurate result
     // Returning the minimal reading
     unsigned int duration = 65535;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 3; i++) {
       digitalWrite(trigPin, LOW);
       delayMicroseconds(2);
       digitalWrite(trigPin, HIGH);
       delayMicroseconds(2);
       digitalWrite(trigPin, LOW);
       unsigned int currentDuration = pulseIn(echoPin, HIGH);
-      if (currentDuration < duration) {
-        duration = currentDuration; 
-      }
+      duration = min(duration, currentDuration);
     }
     // Converting to approximate cm
-    unsigned int cm = duration / 50;
-    Serial.print("Distance in cm: ");
-    Serial.println(cm);
+    float cm = duration / 58.0;
     return cm;
   }
 
   void getDistAndPlay() {
-    unsigned int d = getDist();
-    // if distance greater than 50, play nothing
-    if (d > 50) {
-      pause();
-    } else {
-      int note = map(d, 0, 50, sizeOfScale, 0);
-      playFreq(scale[note]);
+    float d = getDist();
+    Serial.print(myName + "  " + "distance: " + String(d) + "  ");
+    // if distance less than 100, update the note to play
+    if (d < 100) {
+      // want a linear to exponential function
+      // a linear change in d is converted to a geometric change in freq
+      freq = LOW_FREQ * pow(HIGH_FREQ / LOW_FREQ, 100 - d);
     }
-  }
-
-  void playFreq(int freq) {
-    Serial.print("Playing frequency: ");
-    Serial.println(freq);
     tone(speakerPin, freq);
-  }
-
-  void pause() {
-    noTone(speakerPin);
+    Serial.println("frequency: " + String(freq));
   }
 };
 
-Theremin left {"left", leftTrigPin, leftEchoPin, leftSpeakerPin};
-Theremin right {"right", rightTrigPin, rightEchoPin, rightSpeakerPin};
+Theremin theremin {"theremin", LEFT_TRIG_PIN, LEFT_ECHO_PIN, SPEAKER_PIN};
 
 
 void setup() {
   // For debugging
   Serial.begin(9600);
-  
-  // Building up the scale of notes to be used for playing music
-  unsigned int baseFreq = 110;
-  // an array of notes mod 12
-  float penta[5] = {0, 2, 4, 7, 9};
-  
-  for (int i = 0; i < sizeOfScale; i++) {
-    int q = i / 5;  // quotient
-    int r = i % 5;  // remainder
-    // populating the array; float type will be cast back to unsigned int
-    scale[i] = baseFreq * q + float(baseFreq) * pow(2.0, penta[r] / 12.0);
-  }
 
   // Initializing pins
-  left.init();
-  right.init();
+  theremin.init();
 }
 
 void loop() {
-  left.getDistAndPlay();
-  //right.getDistAndPlay();
-  delay(1000);
+  theremin.getDistAndPlay();
+  Serial.println("");
 }
