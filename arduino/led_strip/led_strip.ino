@@ -7,10 +7,10 @@ CRGB leds[NUM_LEDS];  // object from FastLED library
 
 
 // Parameters for switching which function to run and getting button input
-#define NUM_STATES 5
+#define NUM_STATES 6
 bool isButtonFirstPressed = true;  // used to get first button press
 unsigned long start_time = 0;
-byte state = 0;
+byte state = 5;
 
 // Parameters for rainbow()
 byte j = 0;
@@ -41,6 +41,11 @@ double t = 0;
 bool isOn[NUM_LEDS] = { false };
 int numOn = 0;
 
+// Parameters for stack()
+int currentTop = NUM_LEDS - 1;
+int currentIndex = 0;
+
+
 
 void setup() {
   randomSeed(analogRead(0));
@@ -50,7 +55,7 @@ void setup() {
 void loop() {
   changeState();
 
-  switch(state) {
+  switch (state) {
     case 0:
       stepper();
       break;
@@ -66,12 +71,15 @@ void loop() {
     case 4:
       randomFill();
       break;
+    case 5:
+      stack();
+      break;
   }
 }
 
 // Change state every minute or when button is pressed
 void changeState() {
-  // Checking if a minute has elapsed 
+  // Checking if a minute has elapsed
   if (millis() > start_time + 1000UL * 60UL) {
     start_time = millis();
     setRandomState();
@@ -96,6 +104,7 @@ void setRandomState() {
     r++;
   }
   state = r;
+  FastLED.clear();
 }
 
 
@@ -105,7 +114,7 @@ void rainbow() {
     leds[i].g = j;
     leds[i].b = k;
   }
-  
+
   // updating j
   if (k % 2) {
     j++;
@@ -205,18 +214,18 @@ void stepper() {
     dx -= 0.02;
   }
   x += dx;
-  
+
   // Clearing the strip
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i].r = color;
-    leds[i].g = 0;
-    leds[i].b = color;
+    leds[i].r = 1;
+    leds[i].g = 1;
+    leds[i].b = 10;
   }
   // Showing the ball
   for (int i = x - 2; i <= x + 2; i++) {
-    leds[i].r = 0;
+    leds[i].r = color;
     leds[i].g = 255 - color;
-    leds[i].b = color;
+    leds[i].b = 5;
   }
   FastLED.show();
   delay(10);
@@ -226,25 +235,26 @@ void stepper() {
 void math() {
   // Updating time
   t += .01;
-  
+
   // Clearing the strip
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i].r = 0;
-    leds[i].g = 100;
-    leds[i].b = 100;
+    leds[i].g = 2;
+    leds[i].b = 2;
   }
-  
-  // Showing a dot for sine
+
+  // Showing a patch for sine
   int y = NUM_LEDS / 2 + NUM_LEDS * sin(t) / 2;
   leds[y].r = 255;
   leds[y].g = 0;
   leds[y].b = 0;
 
-  // Showing another dot for cosine
+  // Showing another patch for cosine
   y = NUM_LEDS / 2 + NUM_LEDS * cos(t) / 2;
   leds[y].r = 255;
-  leds[y].g = 200;
+  leds[y].g = 255;
   leds[y].b = 0;
+
   FastLED.show();
   delay(10);
 }
@@ -253,16 +263,22 @@ void math() {
 // Randomly fill in the empty LED strip
 void randomFill() {
   // If completely full, reset
-  if (numOn == NUM_LEDS) {
-    isOn[NUM_LEDS] = { false };
+  if (numOn >= NUM_LEDS - 5) {
     numOn = 0;
-    FastLED.clear();
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i].r = 0;
+      leds[i].b = 0;
+      leds[i].g = 0;
+      isOn[i] = false;
+    }
+    FastLED.show();
+    delay(10);
   }
 
   // Getting random led to illuminate
   int r = random(NUM_LEDS - numOn);
   int i = 0;
-  while (r > 0) {
+  while (r >= 0) {
     if (!isOn[i]) {
       r--;
     }
@@ -274,10 +290,45 @@ void randomFill() {
   isOn[i] = true;
   numOn++;
 
-  // Drawing  
-  leds[i].r = 200;
-  leds[i].g = 200;
-  leds[i].b = 100;
+  // Drawing
+  leds[i].r = random(200);
+  leds[i].g = random(200);
+  leds[i].b = random(200);
+  FastLED.show();
+  delay(40);
+}
+
+
+// Stack the LED
+void stack() {
+  if (currentIndex == 0) {
+    leds[0].r = 5;
+    leds[0].g = 255;
+    leds[0].b = 5;
+    currentIndex++;
+  } else if (currentIndex < currentTop) {
+    leds[currentIndex].r = 5;
+    leds[currentIndex].g = 255;
+    leds[currentIndex].b = 5;
+    leds[currentIndex - 1].r = 0;
+    leds[currentIndex - 1].g = 0;
+    leds[currentIndex - 1].b = 0;
+    currentIndex++;
+  } else {
+    leds[currentIndex].r = 5;
+    leds[currentIndex].g = 255;
+    leds[currentIndex].b = 5;
+    leds[currentIndex - 1].r = 0;
+    leds[currentIndex - 1].g = 0;
+    leds[currentIndex - 1].b = 0;
+    currentIndex = 0;
+    currentTop--;
+  }
+
+  if (currentTop == 0) {
+    currentTop = NUM_LEDS - 1;
+  }
+
   FastLED.show();
   delay(10);
 }
