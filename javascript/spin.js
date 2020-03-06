@@ -12,8 +12,9 @@ var c = canvas.getContext('2d');
 class Polygon {
   constructor() {
     this.setRandomColor();
-    this.n = 7;
+    this.n = 3;
     this.r = 100;
+    this.mass = this.r * this.r;
     this.x = this.x = Math.random() * (canvas.width - 2 * this.r) + this.r;
     this.y = this.y = Math.random() * (canvas.height - 2 * this.r) + this.r;
     this.dx = 8 * Math.random() - 4;
@@ -32,6 +33,17 @@ class Polygon {
   // Coordinates of one of the vertices
   getx() { return this.x + this.r * Math.cos(this.theta); }
   gety() { return this.y + this.r * Math.sin(this.theta); }
+
+  // Various energies
+  getKineticEnergy() {
+    return this.mass * (this.dx * this.dx + this.dy * this.dy);
+  }
+  getRotationalEnergy() {
+    // Using a formula from: https://math.stackexchange.com/questions/2004798/
+    let momentOfInertia = this.mass * this.r * this.r / 6 *
+                          (1 + 2 * Math.pow(Math.cos(Math.PI / this.n), 2));
+    return momentOfInertia * this.dtheta * this.dtheta;
+  }
 
   // Update position and angular position.
   updatePosition() {
