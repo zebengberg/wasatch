@@ -40,6 +40,7 @@ double t = 0;
 // Parameters for randomFill()
 bool isOn[NUM_LEDS] = { false };
 int numOn = 0;
+CRGB colors = CRGB(random(256), random(256), random(256));
 
 // Parameters for stack()
 int currentTop = NUM_LEDS - 1;
@@ -263,12 +264,10 @@ void math() {
 // Randomly fill in the empty LED strip
 void randomFill() {
   // If completely full, reset
-  if (numOn >= NUM_LEDS - 5) {
+  if (numOn >= NUM_LEDS - 1) {
     numOn = 0;
+    colors = CRGB(random(256), random(256), random(256));
     for (int i = 0; i < NUM_LEDS; i++) {
-      leds[i].r = 0;
-      leds[i].b = 0;
-      leds[i].g = 0;
       isOn[i] = false;
     }
     FastLED.show();
@@ -291,9 +290,7 @@ void randomFill() {
   numOn++;
 
   // Drawing
-  leds[i].r = random(200);
-  leds[i].g = random(200);
-  leds[i].b = random(200);
+  leds[i] = colors;
   FastLED.show();
   delay(40);
 }
@@ -301,30 +298,29 @@ void randomFill() {
 
 // Stack the LED
 void stack() {
+  // Writing to first LED
   if (currentIndex == 0) {
     leds[0].r = 5;
     leds[0].g = 255;
     leds[0].b = 5;
-    currentIndex++;
-  } else if (currentIndex < currentTop) {
-    leds[currentIndex].r = 5;
-    leds[currentIndex].g = 255;
-    leds[currentIndex].b = 5;
-    leds[currentIndex - 1].r = 0;
-    leds[currentIndex - 1].g = 0;
-    leds[currentIndex - 1].b = 0;
-    currentIndex++;
   } else {
-    leds[currentIndex].r = 5;
-    leds[currentIndex].g = 255;
-    leds[currentIndex].b = 5;
-    leds[currentIndex - 1].r = 0;
-    leds[currentIndex - 1].g = 0;
-    leds[currentIndex - 1].b = 0;
-    currentIndex = 0;
+    // Writing to every 10th LED
+    for (int j = currentIndex; j >= 0; j -= 10) {
+      leds[j].r = 5;
+      leds[j].g = 255;
+      leds[j].b = 5;
+      leds[j - 1].r = 0;
+      leds[j - 1].g = 0;
+      leds[j - 1].b = 0;
+    }
+  }
+  currentIndex++;
+
+  // Resetting indices
+  if (currentIndex > currentTop) {
+    currentIndex -= 10;
     currentTop--;
   }
-
   if (currentTop == 0) {
     currentTop = NUM_LEDS - 1;
   }
