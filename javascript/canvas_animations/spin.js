@@ -15,6 +15,8 @@ class Vector {
 
   get asArray() { return [this.x, this.y]; }
   get norm() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+  // Because coordinate system on html canvas has origin at the upper left, both
+  // perp() and rotate() rotate polygon in the CW direction.
   get perp() { return new Vector(-this.y, this.x); }
   plus(v2) { return new Vector(this.x + v2.x, this.y + v2.y); }
   minus(v2) { return new Vector(this.x - v2.x, this.y - v2.y); }
@@ -96,13 +98,29 @@ class Polygon extends Array {
 
   // Formula for moment of inertia.
   get momentOfInertia() {
+    // translating all vertices to origin
+    for (let i = 0; i <= this.n; i++) {
+      this[i] = this[i].minus(this.cm);
+    }
+    // calculating moment of inertia
     let inertia = 0;
     for (let i = 0; i < this.n; i++) {
       const term = this[i].x * this[i + 1].y - this[i + 1].x * this[i].y;
       inertia += (this[i].y * this[i].y + this[i].y * this[i + 1].y + this[i + 1].y * this[i + 1].y) * term;
       inertia += (this[i].x * this[i].x + this[i].x * this[i + 1].x + this[i + 1].x * this[i + 1].x) * term;
     }
+    // translating away from origin
+    for (let i = 0; i <= this.n; i++) {
+      this[i] = this[i].plus(this.cm);
+    }
     return inertia / 12;
+  }
+
+  // Get velocity vector of an individual vertex.
+  velocityAt(i) {
+    // r is perpendicular to the vector pointing from cm to vertex
+    const r = this[i].minus(this.cm).perp;
+    return this.linearVelocity.plus(r.times(this.angularVelocity));
   }
 
 
@@ -142,29 +160,17 @@ class Polygon extends Array {
 
   // Get the normal vector away from the wall and index of penetrating vertex.
   get normalToWall() {
-    let xCondition = vertex => vertex.x < 0;  // check when poly moving left
-    let xNormal = new Vector(1, 0);
-    if (this.linearVelocity.x > 0) {  // check when poly moving right
-      xCondition = vertex => vertex.x > WIDTH;
-      xNormal = new Vector(-1, 0);
-    }
-
-    let yCondition = vertex => vertex.y < 0;  // check when poly moving up
-    let yNormal = new Vector(0, 1);
-    if (this.linearVelocity.y > 0) {  // check when poly moving down
-      yCondition = vertex => vertex.y > HEIGHT;
-      yNormal = new Vector(0, -1);
-    }
-
     for (let i = 0; i < this.n; i++) {
-      if (xCondition(this[i])) {
-        return [xNormal, i];
-      }
-      if (yCondition(this[i])) {
-        return [yNormal, i];
+      if (this.velocityAt(i).x > 0 && this[i].x > WIDTH) {  // moving right
+        return [new Vector(-1, 0), i];
+      } else if (this.velocityAt(i).x < 0 && this[i].x < 0) {  // moving left
+        return [new Vector(1, 0), i];
+      } else if (this.velocityAt(i).y > 0 && this[i].y > HEIGHT) {  // moving down
+        return [new Vector(0, -1), i];
+      } else if (this.velocityAt(i).y < 0 && this[i].y < 0) {  // moving up
+        return [new Vector(0, 1), i];
       }
     }
-
     return [false, null];  // indicating no penetration
   }
 
@@ -173,16 +179,16 @@ class Polygon extends Array {
   // i is the index of the vertex that penetrates the wall
   // http://www.chrishecker.com/images/e/e7/Gdmphys3.pdf
   collideWithWall(n, i) {
-    // r is perpendicular to vector from cm to penetrating vertex
-    const r = this.cm.minus(this[i]).perp;
+    // r is perpendicular to the vector pointing from cm to vertex
+    const r = this[i].minus(this.cm).perp;
+    const e = 1;  // restitution constant
     // j is scalar impulse
-    const j = -2 * this.linearVelocity.dot(n) /
-      (1 / this.mass + Math.pow(r.dot(n), 2) / this.inertia);
+    const j = -(1 + e) * this.velocityAt(i).dot(n) /
+      (1 / this.mass + r.dot(n) * r.dot(n) / this.inertia);
+    
+    // updating velocities with impulse
     this.linearVelocity = this.linearVelocity.plus(n.times(j / this.mass));
     this.angularVelocity = this.angularVelocity + r.dot(n) * j / this.inertia;
-    console.log('j', j);
-    console.log('angular', this.angularVelocity);
-    console.log('inertia', this.inertia);
   }
 
   // The ray casting algorithm
@@ -209,30 +215,20 @@ class Polygon extends Array {
   
 }
 
-
-
-
-
-
-//   // Various energies
-//   getKineticEnergy() {
-//     return this.mass * (this.dx * this.dx + this.dy * this.dy);
-//   }
-//   getRotationalEnergy() {
-//     // Using a formula from: https://math.stackexchange.com/questions/2004798/
-//     let momentOfInertia = this.mass * this.r * this.r / 6 *
-//                           (1 + 2 * Math.pow(Math.cos(Math.PI / this.n), 2));
-//     return momentOfInertia * this.dtheta * this.dtheta;
-//   }
-
-
-
-const polygon = new Polygon();
+const polygons = [];
+for (let i = 0; i < 2; i++) {
+  polygons.push(new Polygon());
+}
 
 function update() {
+  // clearing the canvas
   c.clearRect(0, 0, canvas.width, canvas.height);
-  polygon.draw();
-  polygon.updatePosition();
+
+  // updating polygons
+  for (let polygon of polygons) {
+    polygon.draw();
+    polygon.updatePosition();
+  }
 }
 
 // Useful for debugging
