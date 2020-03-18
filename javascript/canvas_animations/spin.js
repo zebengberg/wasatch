@@ -15,15 +15,16 @@ class Vector {
 
   get asArray() { return [this.x, this.y]; }
   get norm() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+  get perp() { return new Vector(-this.y, this.x); }
   plus(v2) { return new Vector(this.x + v2.x, this.y + v2.y); }
   minus(v2) { return new Vector(this.x - v2.x, this.y - v2.y); }
   dot(v2) { return this.x * v2.x + this.y * v2.y; }
-  det(v2) { return this.x * v2.y - this.y * v2.x; }
   rotate(theta) {
     const x = this.x * Math.cos(theta) - this.y * Math.sin(theta);
     const y = this.x * Math.sin(theta) + this.y * Math.cos(theta);
     return new Vector(x, y);
   }
+  times(kappa) { return new Vector(kappa * this.x, kappa * this.y); }
 }
 
 
@@ -35,11 +36,10 @@ class Polygon extends Array {
 
     this.setRandomColor();
 
-    // Shoelace formula for area.
-    this.area = 0;
-    for (let i = 0; i < this.n; i++) {
-      this.area += (this[i].x * this[i + 1].y - this[i + 1].x * this[i].y) / 2;
-    }
+    // Only calling these three getters once; using getters for cleanliness.
+    this.mass = this.area;
+    this.cm = this.centerOfMass;
+    this.inertia = this.momentOfInertia;
 
     const LIN_MAX = 4;
     const ANG_MAX = 0.05;
@@ -73,9 +73,17 @@ class Polygon extends Array {
     this.color = 'rgb(' + r + ',' + g + ',' + b + ')';
   }
 
+  // Shoelace formula for area.
+  get area() {
+    let area = 0;
+    for (let i = 0; i < this.n; i++) {
+      area += this[i].x * this[i + 1].y - this[i + 1].x * this[i].y;
+    }
+    return area / 2;
+  }
+
   // Formula for center of mass.
-  get cm() {
-    const a = 6 * this.area;
+  get centerOfMass() {
     let x = 0;
     let y = 0;
     for (let i = 0; i < this.n; i++) {
@@ -83,15 +91,34 @@ class Polygon extends Array {
       x += (this[i].x + this[i + 1].x) * term;
       y += (this[i].y + this[i + 1].y) * term;
     }
-    return new Vector(x / a, y / a);
+    return new Vector(x / (6 * this.area), y / (6 * this.area));
   }
 
+  // Formula for moment of inertia.
+  get momentOfInertia() {
+    let inertia = 0;
+    for (let i = 0; i < this.n; i++) {
+      const term = this[i].x * this[i + 1].y - this[i + 1].x * this[i].y;
+      inertia += (this[i].y * this[i].y + this[i].y * this[i + 1].y + this[i + 1].y * this[i + 1].y) * term;
+      inertia += (this[i].x * this[i].x + this[i].x * this[i + 1].x + this[i + 1].x * this[i + 1].x) * term;
+    }
+    return inertia / 12;
+  }
+
+
   updatePosition() {
+    // Dealing with wall collision
+    const [n, i] = this.normalToWall;
+    if (n) {
+      this.collideWithWall(n, i);
+    }
+
+    // Updating positions by integrating velocity functions
     const oldCM = this.cm;
-    const newCM = oldCM.plus(this.linearVelocity);
-    // perform rotation about center of mass
+    this.cm = oldCM.plus(this.linearVelocity);
+    // Perform rotation about center of mass
     for (let i = 0; i <= this.n; i++) {
-      this[i] = this[i].minus(oldCM).rotate(this.angularVelocity).plus(newCM);
+      this[i] = this[i].minus(oldCM).rotate(this.angularVelocity).plus(this.cm);
     }
   }
 
@@ -113,20 +140,49 @@ class Polygon extends Array {
     c.fill();
   }
 
-  // Returns the normal vector to the wall.
-  normalToWall() {
-    for (let vertex of this) {
-      if (vertex.x < 0) {
-        return Vector(1, 0);
-      } else if (vertex.x > WIDTH) {
-        return Vector(-1, 0);
-      } else if (vertex.y < 0) {
-        return Vector(0, 1);
-      } else if (vertex.y > HEIGHT) {
-        return Vector(0, -1);
+  // Get the normal vector away from the wall and index of penetrating vertex.
+  get normalToWall() {
+    let xCondition = vertex => vertex.x < 0;  // check when poly moving left
+    let xNormal = new Vector(1, 0);
+    if (this.linearVelocity.x > 0) {  // check when poly moving right
+      xCondition = vertex => vertex.x > WIDTH;
+      xNormal = new Vector(-1, 0);
+    }
+
+    let yCondition = vertex => vertex.y < 0;  // check when poly moving up
+    let yNormal = new Vector(0, 1);
+    if (this.linearVelocity.y > 0) {  // check when poly moving down
+      yCondition = vertex => vertex.y > HEIGHT;
+      yNormal = new Vector(0, -1);
+    }
+
+    for (let i = 0; i < this.n; i++) {
+      if (xCondition(this[i])) {
+        return [xNormal, i];
+      }
+      if (yCondition(this[i])) {
+        return [yNormal, i];
       }
     }
-    return false;
+
+    return [false, null];  // indicating no penetration
+  }
+
+
+  // n is the normal vector to the wall
+  // i is the index of the vertex that penetrates the wall
+  // http://www.chrishecker.com/images/e/e7/Gdmphys3.pdf
+  collideWithWall(n, i) {
+    // r is perpendicular to vector from cm to penetrating vertex
+    const r = this.cm.minus(this[i]).perp;
+    // j is scalar impulse
+    const j = -2 * this.linearVelocity.dot(n) /
+      (1 / this.mass + Math.pow(r.dot(n), 2) / this.inertia);
+    this.linearVelocity = this.linearVelocity.plus(n.times(j / this.mass));
+    this.angularVelocity = this.angularVelocity + r.dot(n) * j / this.inertia;
+    console.log('j', j);
+    console.log('angular', this.angularVelocity);
+    console.log('inertia', this.inertia);
   }
 
   // The ray casting algorithm
@@ -157,9 +213,6 @@ class Polygon extends Array {
 
 
 
-//   // Coordinates of one of the vertices
-//   getx() { return this.x + this.r * Math.cos(this.theta); }
-//   gety() { return this.y + this.r * Math.sin(this.theta); }
 
 //   // Various energies
 //   getKineticEnergy() {
