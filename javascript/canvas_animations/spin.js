@@ -4,7 +4,7 @@ const HEIGHT = window.innerHeight - 40;
 const canvas = document.getElementById('myCanvas');
 canvas.width = WIDTH;
 canvas.height = HEIGHT;
-const c = canvas.getContext('2d');
+const context = canvas.getContext('2d');
 
 
 class Vector {
@@ -34,7 +34,10 @@ class Polygon extends Array {
   constructor(vertices = Polygon.buildVertices()) {
     super(...vertices);
     this.n = this.length;
-    this.push(vertices[0]);  // including first vertex at back of array
+
+    // including first and second vertices at back of array
+    this.push(vertices[0]);
+    this.push(vertices[1]);
 
     this.setRandomColor();
 
@@ -43,8 +46,8 @@ class Polygon extends Array {
     this.cm = this.centerOfMass;
     this.inertia = this.momentOfInertia;
 
-    const LIN_MAX = 4;
-    const ANG_MAX = 0.05;
+    const LIN_MAX = 1;
+    const ANG_MAX = 0.01;
     this.linearVelocity = new Vector(LIN_MAX * (2 * Math.random() - 1),
       LIN_MAX * (2 * Math.random() - 1));
     this.angularVelocity = ANG_MAX * (2 * Math.random() - 1);
@@ -53,10 +56,10 @@ class Polygon extends Array {
 
   // Returns random array of vertices defining a polygon.
   static buildVertices() {
-    const n = 3 + Math.floor(3 * Math.random());
+    const n = 3 + Math.floor(4 * Math.random());
     const vertices = [];
     const RADIUS = 100;
-    const NOISE = 100;
+    const NOISE = 120;
     const x = (WIDTH - 2 * RADIUS) * Math.random() + RADIUS;
     const y = (HEIGHT - 2 * RADIUS) * Math.random() + RADIUS;
     for (let i = 0; i < n; i++) {
@@ -117,61 +120,28 @@ class Polygon extends Array {
   }
 
   // Get velocity vector of an individual vertex.
-  velocityAt(i) {
+  velocityAt(v) {
     // r is perpendicular to the vector pointing from cm to vertex
-    const r = this[i].minus(this.cm).perp;
+    const r = v.minus(this.cm).perp;
     return this.linearVelocity.plus(r.times(this.angularVelocity));
-  }
-
-
-  updatePosition() {
-    // Dealing with wall collision
-    const [n, i] = this.normalToWall;
-    if (n) {
-      this.collideWithWall(n, i);
-    }
-
-    // Updating positions by integrating velocity functions
-    const oldCM = this.cm;
-    this.cm = oldCM.plus(this.linearVelocity);
-    // Perform rotation about center of mass
-    for (let i = 0; i <= this.n; i++) {
-      this[i] = this[i].minus(oldCM).rotate(this.angularVelocity).plus(this.cm);
-    }
-  }
-
-  draw() {
-    // drawing polygon
-    c.beginPath();
-    c.moveTo(...this[0].asArray);
-    for (let i = 1; i < this.n; i++) {
-      c.lineTo(...this[i].asArray);
-    }
-    c.closePath();
-    c.fillStyle = this.color;
-    c.fill();
-
-    // drawing center of mass
-    c.beginPath();
-    c.arc(...this.cm.asArray, 10, 0, 2 * Math.PI);
-    c.fillStyle = 'black';
-    c.fill();
   }
 
   // Get the normal vector away from the wall and index of penetrating vertex.
   get normalToWall() {
     for (let i = 0; i < this.n; i++) {
-      if (this.velocityAt(i).x > 0 && this[i].x > WIDTH) {  // moving right
+      if (this.velocityAt(this[i]).x > 0 && this[i].x > WIDTH) {  // moving right
         return [new Vector(-1, 0), i];
-      } else if (this.velocityAt(i).x < 0 && this[i].x < 0) {  // moving left
+      } else if (this.velocityAt(this[i]).x < 0 && this[i].x < 0) {  // moving left
         return [new Vector(1, 0), i];
-      } else if (this.velocityAt(i).y > 0 && this[i].y > HEIGHT) {  // moving down
+      } else if (this.velocityAt(this[i]).y > 0 && this[i].y > HEIGHT) {  // moving down
         return [new Vector(0, -1), i];
-      } else if (this.velocityAt(i).y < 0 && this[i].y < 0) {  // moving up
+      } else if (this.velocityAt(this[i]).y < 0 && this[i].y < 0) {  // moving up
         return [new Vector(0, 1), i];
       }
     }
-    return [false, null];  // indicating no penetration
+    // Might end up here if vertex is penetrating but polygon moving away from
+    // the wall. In this case, return false.
+    return [false, null];
   }
 
 
@@ -182,52 +152,197 @@ class Polygon extends Array {
     // r is perpendicular to the vector pointing from cm to vertex
     const r = this[i].minus(this.cm).perp;
     const e = 1;  // restitution constant
-    // j is scalar impulse
-    const j = -(1 + e) * this.velocityAt(i).dot(n) /
+    // j is impulse scalar
+    const j = -(1 + e) * this.velocityAt(this[i]).dot(n) /
       (1 / this.mass + r.dot(n) * r.dot(n) / this.inertia);
     
     // updating velocities with impulse
     this.linearVelocity = this.linearVelocity.plus(n.times(j / this.mass));
-    this.angularVelocity = this.angularVelocity + r.dot(n) * j / this.inertia;
+    this.angularVelocity += r.dot(n) * j / this.inertia;
   }
 
-  // The ray casting algorithm
-  // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-  // containsPoint(v) {
-  //   let isIn = false;
-  //   let j = this.n - 1;
-  //   for (let i = 0; i < this.n; i++) {
-  //     if (this.x[i])
-  //   }
-  //       for ( int i = 0, j = polygon.Length - 1 ; i < polygon.Length ; j = i++ )
-  //       {
-  //           if ( ( polygon[ i ].Y > p.Y ) != ( polygon[ j ].Y > p.Y ) &&
-  //                p.X < ( polygon[ j ].X - polygon[ i ].X ) * ( p.Y - polygon[ i ].Y ) / ( polygon[ j ].Y - polygon[ i ].Y ) + polygon[ i ].X )
-  //           {
-  //               inside = !inside;
-  //           }
-  //       }
-  //   let intersections = 0;
-  //   for (let i = 0; i < this.n; i++) {
-  //     let s = this.vertices[i + 1].minus(this.vertices[i]);  // an edge of poly
-  //   }
-  // }
-  
+  // Updates the bounding box parallel to coordinate axes around polygon
+  updateBoundingBox() {
+    this.xMin = this.reduce((acc, ver) => acc < ver.x ? acc : ver.x, 1000000);
+    this.xMax = this.reduce((acc, ver) => acc > ver.x ? acc : ver.x, 0);
+    this.yMin = this.reduce((acc, ver) => acc < ver.y ? acc : ver.y, 1000000);
+    this.yMax = this.reduce((acc, ver) => acc > ver.y ? acc : ver.y, 0);
+  }
+
+  // Checking if point is within bounding box; course but fast initial check
+  boxContainsPoint(v) {
+    if (v.x > this.xMin && v.x < this.xMax && v.y > this.yMin && v.y < this.yMax) {
+      return true;
+    }
+    return false;
+  }
+
+  // The ray casting algorithm; slower but thorough final check
+  // https://stackoverflow.com/questions/11716268/point-in-polygon-algorithm
+  containsPoint(v) {
+    let isIn = false;
+    for (let i = 0; i < this.n; i++) {
+      const cond1 = (this[i].y > v.y ) !== (this[i + 1].y > v.y);
+      const cond2 = (v.x <= (this[i + 1].x - this[i].x) * (v.y - this[i].y) / (this[i + 1].y - this[i].y) + this[i].x);
+      if (cond1 && cond2) {
+        isIn = !isIn;
+      }
+    }
+    return isIn;
+  }
+
+
+
+
+
+  updatePosition() {
+    // First update bounding box
+    this.updateBoundingBox();
+
+    // Dealing with wall collision
+    // Start with initial fast check.
+    if (this.xMin < 0 || this.xMax > WIDTH || this.yMin < 0 || this.yMax > HEIGHT) {
+      // Now a more thorough check
+      const [n, i] = this.normalToWall;
+      if (n) {  // n could still be false
+        this.collideWithWall(n, i);
+      }
+    }
+
+    // Updating positions by integrating velocity functions
+    const oldCM = this.cm;
+    this.cm = oldCM.plus(this.linearVelocity);
+    // Perform rotation about center of mass
+    for (let i = 0; i <= this.n + 1; i++) {
+      this[i] = this[i].minus(oldCM).rotate(this.angularVelocity).plus(this.cm);
+    }
+
+    // Gravity!
+    this.linearVelocity.y += 0.005;
+  }
+
+  draw() {
+    // drawing polygon
+    context.beginPath();
+    context.moveTo(...this[0].asArray);
+    for (let i = 1; i < this.n; i++) {
+      context.lineTo(...this[i].asArray);
+    }
+    context.closePath();
+    context.fillStyle = this.color;
+    context.fill();
+
+    // drawing center of mass
+    context.beginPath();
+    context.arc(...this.cm.asArray, 5, 0, 2 * Math.PI);
+    context.fillStyle = 'black';
+    context.fill();
+  }
+}
+
+
+// a, b, c, d are all vectors
+// https://stackoverflow.com/questions/9043805
+// returns true iff the line from a to b intersects with c to d
+function intersects(a, b, c, d) {
+  let det = (b.x - a.x) * (c.y - d.y) - (c.x - d.x) * (b.y - a.y);
+  let lambda = ((c.y - d.y) * (c.x - a.x) + (d.x - c.x) * (c.y - a.y)) / det;
+  let gamma = ((a.y - b.y) * (c.x - a.x) + (b.x - a.x) * (c.y - a.y)) / det;
+  return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
 }
 
 const polygons = [];
-for (let i = 0; i < 2; i++) {
+for (let i = 0; i < 12; i++) {
   polygons.push(new Polygon());
 }
 
+// const poly1 = new Polygon([new Vector(100, 100), new Vector(300, 500), new Vector(400, 300)]);
+// poly1.linearVelocity = new Vector(0, 0);
+
+// const poly2 = new Polygon([new Vector(800, 300), new Vector(700, 200), new Vector(500, 300)]);
+// poly2.linearVelocity = new Vector(-5, .1);
+
+// const polygons = [poly1, poly2];
+
 function update() {
   // clearing the canvas
-  c.clearRect(0, 0, canvas.width, canvas.height);
+  context.clearRect(0, 0, canvas.width, canvas.height);
 
   // updating polygons
-  for (let polygon of polygons) {
-    polygon.draw();
-    polygon.updatePosition();
+  for (let p of polygons) {
+    p.updatePosition();
+    p.draw();
+  }
+
+  // polygon-polygon interactions
+  for (let i = 0; i < polygons.length; i++) {
+    for (let j = 0; j < polygons.length; j++) {
+      if (j !== i) {
+        const p = polygons[i];
+        const q = polygons[j];
+        for (let k = 0; k < p.n; k++) {
+          for (let l = 0; l < q.n; l++) {
+            const a = p[k];
+            const b = p[k + 1];
+            const c = q[l];
+            const d = q[l + 1];
+            const e = q[l + 2];
+            // Check if vertex d of polygon q is intersecting edge a -> b of
+            // polygon p.
+            if (intersects(a, b, c, d) && intersects(a, b, d, e)) {
+              // Show the collision with a red dot
+              context.beginPath();
+              context.arc(...d.asArray, 10, 0, 2 * Math.PI);
+              context.fillStyle = 'yellow';
+              context.fill();
+
+              // Get unit vector normal to edge
+              let n = b.minus(a).perp;
+              n = n.times(1 / n.norm);
+              // n might point in the opposite direction; test by taking dot product
+              if (n.dot(d.minus(q.cm)) > 0) {
+                n = n.times(-1);
+              }
+              
+              
+              // Relative velocity at point of impact
+              const v = q.velocityAt(d).minus(p.velocityAt(d));
+              console.log('velocity edge', p.velocityAt(d));
+              console.log('velocity spike', q.velocityAt(d));
+              console.log('n', n.asArray);
+              console.log('v', v.asArray);
+              console.log('dot', v.dot(n));
+
+              if (v.dot(n) < 0) {
+                // Perform the collision
+                const rq = d.minus(q.cm).perp;
+                const rp = d.minus(p.cm).perp;
+
+                
+                
+                console.log('rq', rp.asArray);
+                console.log('rp', rq.asArray);
+
+                // j is scalar impulse
+                const j = -2 * v.dot(n) /
+                  (1 / p.mass + 1 / q.mass + 
+                    rq.dot(n) * rq.dot(n) / q.inertia +
+                    rp.dot(n) * rp.dot(n) / p.inertia
+                  );
+                console.log(j);
+                
+                // updating velocities with impulse
+                q.linearVelocity = q.linearVelocity.plus(n.times(j / q.mass));
+                p.linearVelocity = p.linearVelocity.minus(n.times(j / p.mass));
+                q.angularVelocity += rq.dot(n) * j / q.inertia;
+                p.angularVelocity -= rp.dot(n) * j / p.inertia;
+
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
