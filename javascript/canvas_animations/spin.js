@@ -336,7 +336,28 @@ function update() {
 }
 
 // Useful for debugging
-canvas.addEventListener('keydown', update, false);
+canvas.onkeydown = update;
+
+// Add new polygons on the fly
+canvas.onmousedown = event => {
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  const v = new Vector(x, y);
+  let removed = false;
+  for (let i = 0; i < polygons.length; i++) {
+    if (polygons[i].containsPoint(v)) {
+      // remove the clicked polygon
+      polygons.splice(i, 1);
+      removed = true;
+      break;
+    }
+  }
+  // If nothing removed, add a new random polygon
+  if (!removed) {
+    polygons.push(new Polygon());
+  }
+};
 
 // Updating the html canvas
 setInterval(update, 10);
