@@ -35,9 +35,8 @@ class Polygon extends Array {
     super(...vertices);
     this.n = this.length;
 
-    // including first and second vertices at back of array
+    // pushing first vertex at back of array
     this.push(vertices[0]);
-    this.push(vertices[1]);
 
     this.setRandomColor();
 
@@ -47,7 +46,7 @@ class Polygon extends Array {
     this.inertia = this.momentOfInertia;
 
     const LIN_MAX = 1;
-    const ANG_MAX = 0.01;
+    const ANG_MAX = 0.05;
     this.linearVelocity = new Vector(LIN_MAX * (2 * Math.random() - 1),
       LIN_MAX * (2 * Math.random() - 1));
     this.angularVelocity = ANG_MAX * (2 * Math.random() - 1);
@@ -191,10 +190,6 @@ class Polygon extends Array {
     return isIn;
   }
 
-
-
-
-
   updatePosition() {
     // First update bounding box
     this.updateBoundingBox();
@@ -213,12 +208,12 @@ class Polygon extends Array {
     const oldCM = this.cm;
     this.cm = oldCM.plus(this.linearVelocity);
     // Perform rotation about center of mass
-    for (let i = 0; i <= this.n + 1; i++) {
+    for (let i = 0; i <= this.n; i++) {
       this[i] = this[i].minus(oldCM).rotate(this.angularVelocity).plus(this.cm);
     }
 
     // Gravity!
-    this.linearVelocity.y += 0.005;
+    //this.linearVelocity.y += 0.005;
   }
 
   draw() {
@@ -251,24 +246,78 @@ function intersects(a, b, c, d) {
   return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
 }
 
+// Determines if poly1 and poly2 are colliding, and updates velocities with
+// impulse to enact collision.
+function polygonCollide(poly1, poly2) {
+  for (let l = 0; l < poly2.n; l++) {
+    const d = poly2[l];  // the vertex to check for penetration
+
+    // First checking quickly if bounding box around poly1 contains d
+    if (poly1.boxContainsPoint(d)) {
+      // Now checking more slowly if polygon actually contains d
+      if (poly1.containsPoint(d)) {
+        // Now determining which edge of poly1 is penetrated by d
+        for (let k = 0; k < poly1.n; k++) {
+          const a = poly1[k];
+          const b = poly1[k + 1];
+
+          // Checking if edge poly2.cm -> d of poly2 is intersecting edge a -> b of poly1
+          // Assuming that centroid of poly2 is contained within poly2
+          if (intersects(a, b, poly2.cm, d)) {
+            // Show the collision with a red dot
+            context.beginPath();
+            context.arc(...d.asArray, 10, 0, 2 * Math.PI);
+            context.fillStyle = 'red';
+            context.fill();
+
+            // Get unit vector normal to edge
+            let n = b.minus(a).perp;
+            n = n.times(1 / n.norm);
+            // n might point in the opposite direction; test by taking dot product
+            if (n.dot(d.minus(poly2.cm)) > 0) {
+              n = n.times(-1);
+            }
+            
+            // Relative velocity at point of impact
+            let v = poly2.velocityAt(d).minus(poly1.velocityAt(d));
+
+            if (v.dot(n) < 0) {  // penetration point moving deeper into poly1
+              // Perform the collision
+              const r2 = d.minus(poly2.cm).perp;
+              const r1 = d.minus(poly1.cm).perp;
+
+              // j is scalar impulse
+              const j = -2 * v.dot(n) /
+                (1 / poly1.mass + 1 / poly2.mass +
+                  r1.dot(n) * r1.dot(n) / poly1.inertia + 
+                  r2.dot(n) * r2.dot(n) / poly2.inertia
+                );
+              
+              // Updating velocities with impulse
+              poly2.linearVelocity = poly2.linearVelocity.plus(n.times(j / poly2.mass));
+              poly1.linearVelocity = poly1.linearVelocity.minus(n.times(j / poly1.mass));
+              poly2.angularVelocity += r2.dot(n) * j / poly2.inertia;
+              poly1.angularVelocity -= r1.dot(n) * j / poly1.inertia;
+            }
+            break;  // break out of inner for-loop
+          }
+        }
+      }
+    }
+  }
+}
+
 const polygons = [];
-for (let i = 0; i < 12; i++) {
+for (let i = 0; i < 8; i++) {
   polygons.push(new Polygon());
 }
 
-// const poly1 = new Polygon([new Vector(100, 100), new Vector(300, 500), new Vector(400, 300)]);
-// poly1.linearVelocity = new Vector(0, 0);
-
-// const poly2 = new Polygon([new Vector(800, 300), new Vector(700, 200), new Vector(500, 300)]);
-// poly2.linearVelocity = new Vector(-5, .1);
-
-// const polygons = [poly1, poly2];
 
 function update() {
   // clearing the canvas
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  // updating polygons
+  // updating polygon positions and drawing
   for (let p of polygons) {
     p.updatePosition();
     p.draw();
@@ -278,69 +327,9 @@ function update() {
   for (let i = 0; i < polygons.length; i++) {
     for (let j = 0; j < polygons.length; j++) {
       if (j !== i) {
-        const p = polygons[i];
-        const q = polygons[j];
-        for (let k = 0; k < p.n; k++) {
-          for (let l = 0; l < q.n; l++) {
-            const a = p[k];
-            const b = p[k + 1];
-            const c = q[l];
-            const d = q[l + 1];
-            const e = q[l + 2];
-            // Check if vertex d of polygon q is intersecting edge a -> b of
-            // polygon p.
-            if (intersects(a, b, c, d) && intersects(a, b, d, e)) {
-              // Show the collision with a red dot
-              context.beginPath();
-              context.arc(...d.asArray, 10, 0, 2 * Math.PI);
-              context.fillStyle = 'yellow';
-              context.fill();
-
-              // Get unit vector normal to edge
-              let n = b.minus(a).perp;
-              n = n.times(1 / n.norm);
-              // n might point in the opposite direction; test by taking dot product
-              if (n.dot(d.minus(q.cm)) > 0) {
-                n = n.times(-1);
-              }
-              
-              
-              // Relative velocity at point of impact
-              const v = q.velocityAt(d).minus(p.velocityAt(d));
-              console.log('velocity edge', p.velocityAt(d));
-              console.log('velocity spike', q.velocityAt(d));
-              console.log('n', n.asArray);
-              console.log('v', v.asArray);
-              console.log('dot', v.dot(n));
-
-              if (v.dot(n) < 0) {
-                // Perform the collision
-                const rq = d.minus(q.cm).perp;
-                const rp = d.minus(p.cm).perp;
-
-                
-                
-                console.log('rq', rp.asArray);
-                console.log('rp', rq.asArray);
-
-                // j is scalar impulse
-                const j = -2 * v.dot(n) /
-                  (1 / p.mass + 1 / q.mass + 
-                    rq.dot(n) * rq.dot(n) / q.inertia +
-                    rp.dot(n) * rp.dot(n) / p.inertia
-                  );
-                console.log(j);
-                
-                // updating velocities with impulse
-                q.linearVelocity = q.linearVelocity.plus(n.times(j / q.mass));
-                p.linearVelocity = p.linearVelocity.minus(n.times(j / p.mass));
-                q.angularVelocity += rq.dot(n) * j / q.inertia;
-                p.angularVelocity -= rp.dot(n) * j / p.inertia;
-
-              }
-            }
-          }
-        }
+        const poly1 = polygons[i];
+        const poly2 = polygons[j];
+        polygonCollide(poly1, poly2);
       }
     }
   }
