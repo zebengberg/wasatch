@@ -315,8 +315,8 @@ const context = canvas.getContext('2d');
 let WIDTH, HEIGHT;
 resizeCanvas();
 function resizeCanvas() {
-  WIDTH = window.innerWidth - 10;
-  HEIGHT = window.innerHeight - 10;
+  WIDTH = window.innerWidth - 20;
+  HEIGHT = window.innerHeight - 20;
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
 }
