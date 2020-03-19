@@ -1,10 +1,8 @@
-// jshint esversion: 6
+// A simulation of deformation-based collisions with balls.
 
-// Getting html elements.
-let canvas = document.getElementById('myCanvas');
-canvas.width = window.innerWidth - 10;
-canvas.height = window.innerHeight - 10;
-var c = canvas.getContext('2d');
+// To see simulation in action, visit:
+// https://zebengberg.github.io/school-projects/javascript/canvas_animations/collision.html
+// Licensed under the MIT license.
 
 
 class Ball {
@@ -46,9 +44,9 @@ class Ball {
   }
 
   setRandomColor() {
-    let r = Math.floor(Math.random() * 256);
-    let g = Math.floor(Math.random() * 256);
-    let b = Math.floor(Math.random() * 256);
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
     this.color = 'rgb(' + r + ',' + g + ',' + b + ')';
   }
 
@@ -69,8 +67,13 @@ class Ball {
     c.fill();
   }
 
+  // Determines if point (x, y) is contained within this ball.
+  contains(x, y) {
+    return Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) <= Math.pow(this.r, 2);
+  }
+
   // Get kinetic energy.
-  getEnergy() { return this.mass * (this.dx * this.dx + this.dy * this.dy); }
+  get energy() { return this.mass * (this.dx * this.dx + this.dy * this.dy); }
 
   // Get distance between two balls
   static getDistance(ball1, ball2) {
@@ -80,12 +83,12 @@ class Ball {
   // Model and draw collision between two balls.
   static collision(ball1, ball2) {
     // Getting both intersection points between overlapping circles.
-    let dist = Ball.getDistance(ball1, ball2);
-    let disc = Math.sqrt(2 * (ball1.r * ball1.r + ball2.r * ball2.r) / (dist * dist) - 1) / 2;
-    let x1 = (ball1.x + ball2.x) / 2 + disc * (ball2.y - ball1.y);
-    let y1 = (ball1.y + ball2.y) / 2 + disc * (ball1.x - ball2.x);
-    let x2 = (ball1.x + ball2.x) / 2 - disc * (ball2.y - ball1.y);
-    let y2 = (ball1.y + ball2.y) / 2 - disc * (ball1.x - ball2.x);
+    const dist = Ball.getDistance(ball1, ball2);
+    const disc = Math.sqrt(2 * (ball1.r * ball1.r + ball2.r * ball2.r) / (dist * dist) - 1) / 2;
+    const x1 = (ball1.x + ball2.x) / 2 + disc * (ball2.y - ball1.y);
+    const y1 = (ball1.y + ball2.y) / 2 + disc * (ball1.x - ball2.x);
+    const x2 = (ball1.x + ball2.x) / 2 - disc * (ball2.y - ball1.y);
+    const y2 = (ball1.y + ball2.y) / 2 - disc * (ball1.x - ball2.x);
 
     // Now drawing the circles.
     // Drawing all of ball2 first, then a sector of ball1 so that it doesn't overlap ball2.
@@ -94,8 +97,8 @@ class Ball {
       ball2.hasBeenDrawn = true;
     }
 
-    let alpha1 = Math.atan2(y1 - ball1.y, x1 - ball1.x);
-    let beta1 = Math.atan2(y2 - ball1.y, x2 - ball1.x);
+    const alpha1 = Math.atan2(y1 - ball1.y, x1 - ball1.x);
+    const beta1 = Math.atan2(y2 - ball1.y, x2 - ball1.x);
     if (!ball1.hasBeenDrawn) {
       ball1.draw(alpha1, beta1);
       ball1.hasBeenDrawn = true;
@@ -109,6 +112,16 @@ class Ball {
     c.strokeStyle = 'yellow';
     c.stroke();
   }
+}
+
+
+// Getting global html elements.
+const canvas = document.getElementById('canvas');
+const c = canvas.getContext('2d');
+resizeCanvas();
+function resizeCanvas() {
+  canvas.width = window.innerWidth - 10;
+  canvas.height = window.innerHeight - 35;
 }
 
 // two global variables
@@ -136,49 +149,83 @@ getUserInput();
 
 
 function update() {
-  // For nerding out and considering the distribution of particle kinetic energies.
-  let energies = balls.map(ball => ball.getEnergy());
-  console.log('min: ' + Math.min(...energies));
-  console.log('mean: ' + energies.reduce((a, b) => a + b, 0) / nBalls);
-  console.log('max: ' + Math.max(...energies));
-  console.log('');
-
-
+  // Updating canvas
+  resizeCanvas();
   c.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Updating individual balls
   for (let ball of balls) {
     ball.updatePosition();
     ball.hasBeenDrawn = false;
     // Drawing all balls once now.
     ball.draw();
   }
+
+  // Considering collisions between pairs of balls
   for (var i = 0; i < nBalls; i++) {
     for (var j = i + 1; j < nBalls; j++) {
-      ball1 = balls[i];
-      ball2 = balls[j];
-      let dist = Ball.getDistance(ball1, ball2);
+      const ball1 = balls[i];
+      const ball2 = balls[j];
+      const dist = Ball.getDistance(ball1, ball2);
       if (dist <= ball1.r + ball2.r) {
         // This does the drawing.
         Ball.collision(ball1, ball2);
 
+        // Don't want additional energy to creep in
+        const preEnergy = ball1.energy + ball2.energy;
+
         // Now applying normal forces.
-        let dx = ball1.x - ball2.x;
-        let dy = ball1.y - ball2.y;
+        const dx = ball1.x - ball2.x;
+        const dy = ball1.y - ball2.y;
         // This is where all the physics happens; change ball.dx inversely
         // proportionally to the distance between center of the balls.
         // Mathematically, we just need a function which grows to infinity as
         // dx approaches 0.
-        // Scale by mass of the other ball. The constant 10 is arbitrary.
-        ball1.dx += Ball.squish * ball2.mass * dx / (100 * dist * dist);
-        ball2.dx -= Ball.squish * ball1.mass * dx / (100 * dist * dist);
-        ball1.dy += Ball.squish * ball2.mass * dy / (100 * dist * dist);
-        ball2.dy -= Ball.squish * ball1.mass * dy / (100 * dist * dist);
+        // Scale by mass of the other ball. The constant 1000 is arbitrary.
+        ball1.dx += Ball.squish * ball2.mass * dx / (1000 * dist * dist);
+        ball2.dx -= Ball.squish * ball1.mass * dx / (1000 * dist * dist);
+        ball1.dy += Ball.squish * ball2.mass * dy / (1000 * dist * dist);
+        ball2.dy -= Ball.squish * ball1.mass * dy / (1000 * dist * dist);
+
+        // Considering the ratio of energies; scaling to keep energy constant.
+        // Ideally this would happen after collision is completely finished.
+        // This solution approximates that ideal.
+        const postEnergy = ball1.energy + ball2.energy;
+        const energyScaler = Math.sqrt(preEnergy / postEnergy);
+        ball1.dx *= energyScaler;
+        ball1.dy *= energyScaler;
+        ball2.dx *= energyScaler;
+        ball2.dy *= energyScaler;
       }
     }
   }
 }
 
 // Useful for debugging
-canvas.addEventListener('keydown', update, false);
+canvas.onkeydown = update;
+
+// Add new balls on the fly with a mouse click
+canvas.onmousedown = event => {
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  let removed = false;
+  for (let i = 0; i < balls.length; i++) {
+    if (balls[i].contains(x, y)) {
+      // remove the clicked ball
+      balls.splice(i, 1);
+      nBalls--;
+      removed = true;
+      break;
+    }
+  }
+  // If nothing removed, add a new random ball
+  if (!removed) {
+    balls.push(new Ball(null, x, y));
+    nBalls++;
+  }
+};
 
 // Updating the html canvas
 setInterval(update, 10);
