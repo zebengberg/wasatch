@@ -1,22 +1,23 @@
-// Getting html elements.
-const WIDTH = window.innerWidth - 20;
-const HEIGHT = window.innerHeight - 40;
-const canvas = document.getElementById('myCanvas');
-canvas.width = WIDTH;
-canvas.height = HEIGHT;
-const context = canvas.getContext('2d');
+// A simulation of impulse-based collisions with polygons.
+// Each polygon has a linear and angular velocity. Polygons interact with each
+// other as well as walls.
+
+// To see simulation in action, visit:
+// https://zebengberg.github.io/school-projects/javascript/canvas_animations/spin.html
+// Licensed under the MIT license.
 
 
+// Minimal vector class
 class Vector {
   constructor(x, y) {
     this.x = x;
     this.y = y;
   }
-
   get asArray() { return [this.x, this.y]; }
   get norm() { return Math.sqrt(this.x * this.x + this.y * this.y); }
   // Because coordinate system on html canvas has origin at the upper left, both
-  // perp() and rotate() rotate polygon in the CW direction.
+  // perp() and rotate() rotate polygon in the CW direction. This is not
+  // particularly important to the actual physics.
   get perp() { return new Vector(-this.y, this.x); }
   plus(v2) { return new Vector(this.x + v2.x, this.y + v2.y); }
   minus(v2) { return new Vector(this.x - v2.x, this.y - v2.y); }
@@ -30,6 +31,8 @@ class Vector {
 }
 
 
+// Main class holding polygon objects to be rendered on the canvas. Each polygon
+// object consists of an array of Vectors constituting its vertices.
 class Polygon extends Array {
   constructor(vertices = Polygon.buildVertices()) {
     super(...vertices);
@@ -143,7 +146,6 @@ class Polygon extends Array {
     return [false, null];
   }
 
-
   // n is the normal vector to the wall
   // i is the index of the vertex that penetrates the wall
   // http://www.chrishecker.com/images/e/e7/Gdmphys3.pdf
@@ -176,7 +178,7 @@ class Polygon extends Array {
     return false;
   }
 
-  // The ray casting algorithm; slower but thorough final check
+  // The ray casting algorithm; slower but thorough check compared with above method.
   // https://stackoverflow.com/questions/11716268/point-in-polygon-algorithm
   containsPoint(v) {
     let isIn = false;
@@ -195,7 +197,7 @@ class Polygon extends Array {
     this.updateBoundingBox();
 
     // Dealing with wall collision
-    // Start with initial fast check.
+    // Start with initial fast check based on bounding box.
     if (this.xMin < 0 || this.xMax > WIDTH || this.yMin < 0 || this.yMax > HEIGHT) {
       // Now a more thorough check
       const [n, i] = this.normalToWall;
@@ -207,27 +209,26 @@ class Polygon extends Array {
     // Updating positions by integrating velocity functions
     const oldCM = this.cm;
     this.cm = oldCM.plus(this.linearVelocity);
-    // Perform rotation about center of mass
+    // Performing rotation about center of mass
     for (let i = 0; i <= this.n; i++) {
       this[i] = this[i].minus(oldCM).rotate(this.angularVelocity).plus(this.cm);
     }
 
-    // Gravity!
-    //this.linearVelocity.y += 0.005;
+    // Gravity -- optional
+    // this.linearVelocity.y += 0.05;
   }
 
+  // Drawing the polygon and its center of mass.
   draw() {
-    // drawing polygon
     context.beginPath();
     context.moveTo(...this[0].asArray);
     for (let i = 1; i < this.n; i++) {
       context.lineTo(...this[i].asArray);
     }
-    context.closePath();
     context.fillStyle = this.color;
     context.fill();
 
-    // drawing center of mass
+    // Drawing the center of mass as a black dot.
     context.beginPath();
     context.arc(...this.cm.asArray, 5, 0, 2 * Math.PI);
     context.fillStyle = 'black';
@@ -236,9 +237,9 @@ class Polygon extends Array {
 }
 
 
-// a, b, c, d are all vectors
+// Parameters a, b, c, d are all instances of Vector.
 // https://stackoverflow.com/questions/9043805
-// returns true iff the line from a to b intersects with c to d
+// Checks if the segment from a to b intersects with segment from c to d.
 function intersects(a, b, c, d) {
   let det = (b.x - a.x) * (c.y - d.y) - (c.x - d.x) * (b.y - a.y);
   let lambda = ((c.y - d.y) * (c.x - a.x) + (d.x - c.x) * (c.y - a.y)) / det;
@@ -248,13 +249,14 @@ function intersects(a, b, c, d) {
 
 // Determines if poly1 and poly2 are colliding, and updates velocities with
 // impulse to enact collision.
+// http://www.chrishecker.com/images/e/e7/Gdmphys3.pdf
 function polygonCollide(poly1, poly2) {
   for (let l = 0; l < poly2.n; l++) {
     const d = poly2[l];  // the vertex to check for penetration
 
     // First checking quickly if bounding box around poly1 contains d
     if (poly1.boxContainsPoint(d)) {
-      // Now checking more slowly if polygon actually contains d
+      // Now checking more thoroughly if polygon actually contains d
       if (poly1.containsPoint(d)) {
         // Now determining which edge of poly1 is penetrated by d
         for (let k = 0; k < poly1.n; k++) {
@@ -264,13 +266,13 @@ function polygonCollide(poly1, poly2) {
           // Checking if edge poly2.cm -> d of poly2 is intersecting edge a -> b of poly1
           // Assuming that centroid of poly2 is contained within poly2
           if (intersects(a, b, poly2.cm, d)) {
-            // Show the collision with a red dot
+            // Show the collision with a brief red dot
             context.beginPath();
             context.arc(...d.asArray, 10, 0, 2 * Math.PI);
             context.fillStyle = 'red';
             context.fill();
 
-            // Get unit vector normal to edge
+            // Finding unit vector normal to edge pointing away from poly1
             let n = b.minus(a).perp;
             n = n.times(1 / n.norm);
             // n might point in the opposite direction; test by taking dot product
@@ -282,7 +284,7 @@ function polygonCollide(poly1, poly2) {
             let v = poly2.velocityAt(d).minus(poly1.velocityAt(d));
 
             if (v.dot(n) < 0) {  // penetration point moving deeper into poly1
-              // Perform the collision
+              // Performing the collision between poly1 and poly2
               const r2 = d.minus(poly2.cm).perp;
               const r1 = d.minus(poly1.cm).perp;
 
@@ -299,7 +301,7 @@ function polygonCollide(poly1, poly2) {
               poly2.angularVelocity += r2.dot(n) * j / poly2.inertia;
               poly1.angularVelocity -= r1.dot(n) * j / poly1.inertia;
             }
-            break;  // break out of inner for-loop
+            break;  // break out of inner for-loop since we've already found edge
           }
         }
       }
@@ -307,23 +309,39 @@ function polygonCollide(poly1, poly2) {
   }
 }
 
+// Getting global html elements.
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+let WIDTH, HEIGHT;
+resizeCanvas();
+function resizeCanvas() {
+  WIDTH = window.innerWidth - 10;
+  HEIGHT = window.innerHeight - 10;
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+}
+
+
+// Global polygons array
 const polygons = [];
-for (let i = 0; i < 8; i++) {
+const NUM_POLYGONS = 8;
+for (let i = 0; i < NUM_POLYGONS; i++) {
   polygons.push(new Polygon());
 }
 
 
 function update() {
-  // clearing the canvas
+  // Updating and clearing the canvas
+  resizeCanvas();
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  // updating polygon positions and drawing
+  // Updating polygon positions and drawing
   for (let p of polygons) {
     p.updatePosition();
     p.draw();
   }
 
-  // polygon-polygon interactions
+  // Polygon-polygon collisions; consider all ordered pairs of distinct polygons
   for (let i = 0; i < polygons.length; i++) {
     for (let j = 0; j < polygons.length; j++) {
       if (j !== i) {
@@ -338,7 +356,7 @@ function update() {
 // Useful for debugging
 canvas.onkeydown = update;
 
-// Add new polygons on the fly
+// Add new polygons on the fly with a mouse click
 canvas.onmousedown = event => {
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -360,4 +378,4 @@ canvas.onmousedown = event => {
 };
 
 // Updating the html canvas
-setInterval(update, 10);
+setInterval(update, 20);
