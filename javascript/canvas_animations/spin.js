@@ -378,4 +378,4 @@ canvas.onmousedown = event => {
 };
 
 // Updating the html canvas
-setInterval(update, 20);
+setInterval(update, 10);
