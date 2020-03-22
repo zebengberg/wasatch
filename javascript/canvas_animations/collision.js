@@ -144,7 +144,6 @@ function getUserInput() {
     Ball.radius = function() { return 50 * Math.random() + 5; };
   }
   Ball.gravity = document.getElementById('gravity').checked;
-  console.log(Ball.gravity);
 
   balls = [];
   for (let i = 0; i < nBalls; i++) {
