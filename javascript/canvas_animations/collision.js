@@ -56,6 +56,11 @@ class Ball {
     if ((this.y - this.r <= 0) || (this.y + this.r >= canvas.height)) { this.dy *= -1; }
     this.x += this.dx;
     this.y += this.dy;
+    
+    // Apply gravity
+    if (Ball.gravity) {
+      this.dy += 0.03;
+    }
   }
 
   // Draw arc of circle centered at x, y.
@@ -138,6 +143,8 @@ function getUserInput() {
   } else {
     Ball.radius = function() { return 50 * Math.random() + 5; };
   }
+  Ball.gravity = document.getElementById('gravity').checked;
+  console.log(Ball.gravity);
 
   balls = [];
   for (let i = 0; i < nBalls; i++) {
