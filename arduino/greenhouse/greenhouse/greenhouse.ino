@@ -5,18 +5,21 @@
  * enough, the fans turn on.
  */
 
+
 // pins and constants
 #define VOLTAGEPIN 0
 #define BUTTONPIN 2
 #define RESISTOR1 100000.0
 #define RESISTOR2 10000.0
-#define LEDPIN 6
-#define FANPIN1 8
-#define FANPIN2 9
+#define LEDPIN 13
+#define FANPIN1 10
+#define FANPIN2 11
+
 
 // global variables
 unsigned int buttonState = 0;
 bool isButtonDown = false;
+
 
 void setup(){
    pinMode(BUTTONPIN, INPUT);
@@ -24,6 +27,7 @@ void setup(){
    pinMode(FANPIN1, OUTPUT);
    pinMode(FANPIN2, OUTPUT);
 }
+
 
 void loop(){
   setButtonState();
@@ -56,14 +60,15 @@ void setButtonState() {
   }
 }
 
+
 // Blink LED to indicate button state or low voltage.
 void blinkLED() {
-  if (getVoltage() < 12.5) {
-    // Blink every 10ms
-    int state = millis() / 10 % 2;
+  if (getVoltage() < 12.2) {
+    // Blink every 100ms to indicate low voltage.
+    int state = millis() / 100 % 2;
     digitalWrite(LEDPIN, state);
   } else {
-    // Blink a pattern every 100ms
+    // Blink a pattern every 1000ms.
     int state = millis() / 100 % 10;
     switch (buttonState) {
       case 0:
@@ -79,29 +84,39 @@ void blinkLED() {
   }
 }
 
+
 // Use transistors to power fans.
 void runFans() {
+  float voltage = getVoltage();
   switch (buttonState) {
     case 0:
-      digitalWrite(FANPIN1, LOW);
+      // Power one fan depending on voltage.
       digitalWrite(FANPIN2, LOW);
+      if (voltage > 13.0) {
+        digitalWrite(FANPIN1, HIGH);
+      } else if (voltage < 12.5) {
+        digitalWrite(FANPIN1, LOW);
+      }
       break;
       
     case 1:
-      // Fans powered on depending on voltage.
-      if (getVoltage() > 13) {
+      // Power both fans depending on voltage.
+      if (voltage > 13.0) {
         digitalWrite(FANPIN1, HIGH);
         digitalWrite(FANPIN2, HIGH);
-      } else if (getVoltage() < 12.6) {
+      } else if (voltage < 12.5) {
         digitalWrite(FANPIN1, LOW);
+        digitalWrite(FANPIN2, LOW);
+      } else if (voltage < 12.8) {
+        digitalWrite(FANPIN1, HIGH);
         digitalWrite(FANPIN2, LOW);
       }
       break;
       
     case 2:
-      // Fans on.
-      digitalWrite(FANPIN1, HIGH);
-      digitalWrite(FANPIN2, HIGH);
+      // Power both fans unless voltage very low.
+      digitalWrite(FANPIN1, voltage > 12.2);
+      digitalWrite(FANPIN2, voltage > 12.2);
       break;
   }
 }
