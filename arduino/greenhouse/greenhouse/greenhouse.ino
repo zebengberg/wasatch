@@ -2,7 +2,9 @@
  * Code to control 12V DC fans inside of greenhouse.
  * The 12V battery is charged by a solar panel. If both the
  * battery voltage is high enough and the temperature is warm
- * enough, the fans turn on.
+ * enough, the fans turn on. Both transistors are attached to
+ * the same heatsink, and thus share a common collector. We
+ * cannot operator each independently with this setup.
  */
 
 
@@ -12,6 +14,7 @@
 #define RESISTOR1 100000.0
 #define RESISTOR2 10000.0
 #define LEDPIN 13
+#define LIGHTPIN 2
 #define FANPIN1 10
 #define FANPIN2 11
 
@@ -19,13 +22,16 @@
 // global variables
 unsigned int buttonState = 0;
 bool isButtonDown = false;
+bool fanState = LOW;
 
 
 void setup(){
    pinMode(BUTTONPIN, INPUT);
+   pinMode(LIGHTPIN, INPUT);
    pinMode(LEDPIN, OUTPUT);
    pinMode(FANPIN1, OUTPUT);
    pinMode(FANPIN2, OUTPUT);
+   Serial.begin(9600);
 }
 
 
@@ -36,7 +42,7 @@ void loop(){
 }
 
 
-// Reading the exact voltage of the 12V battery.
+// Read the exact voltage of the 12V battery.
 float getVoltage() {
   float vout = analogRead(VOLTAGEPIN) * 5.0 / 1024.0;
   // Scaling based on true voltmeter reading.
@@ -46,8 +52,13 @@ float getVoltage() {
   return vin;
 }
 
+// Read the value from the light sensor.
+int getLight() {
+  return analogRead(LIGHTPIN);
+}
 
-// Reading the state of the button and setting global button
+
+// Read the state of the button and setting global button
 // variables.
 void setButtonState() {
   // Getting instance when button first pressed.
@@ -88,35 +99,40 @@ void blinkLED() {
 // Use transistors to power fans.
 void runFans() {
   float voltage = getVoltage();
+  int light = getLight();  // values between 0 and 1023
+  Serial.println(voltage);
+  
   switch (buttonState) {
     case 0:
-      // Power one fan depending on voltage.
-      digitalWrite(FANPIN2, LOW);
-      if (voltage > 13.0) {
-        digitalWrite(FANPIN1, HIGH);
-      } else if (voltage < 12.5) {
-        digitalWrite(FANPIN1, LOW);
+      // Power fans depending on voltage and light.
+      // There is an intermediate range in which fanState not changed.
+      if (voltage > 13.4 && light > 700) {
+        fanState = HIGH;
+      } else if (voltage < 12.6 || light < 600) {
+        fanState = LOW;
       }
       break;
       
     case 1:
-      // Power both fans depending on voltage.
-      if (voltage > 13.0) {
-        digitalWrite(FANPIN1, HIGH);
-        digitalWrite(FANPIN2, HIGH);
-      } else if (voltage < 12.5) {
-        digitalWrite(FANPIN1, LOW);
-        digitalWrite(FANPIN2, LOW);
-      } else if (voltage < 12.8) {
-        digitalWrite(FANPIN1, HIGH);
-        digitalWrite(FANPIN2, LOW);
+      // Power fans depending on voltage.
+      if (voltage > 13.4) {
+        fanState = HIGH;
+      } else if (voltage < 12.6) {
+        fanState = LOW;
       }
       break;
       
     case 2:
       // Power both fans unless voltage very low.
-      digitalWrite(FANPIN1, voltage > 12.2);
-      digitalWrite(FANPIN2, voltage > 12.2);
+      if (voltage > 12.2) {
+        fanState = HIGH;
+      } else {
+        fanState = LOW;
+      }
       break;
   }
+
+  // Writing fanState to transistors.
+  digitalWrite(FANPIN1, fanState);
+  digitalWrite(FANPIN2, fanState);
 }
