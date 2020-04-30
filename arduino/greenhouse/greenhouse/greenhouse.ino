@@ -31,7 +31,6 @@ void setup(){
    pinMode(LEDPIN, OUTPUT);
    pinMode(FANPIN1, OUTPUT);
    pinMode(FANPIN2, OUTPUT);
-   Serial.begin(9600);
 }
 
 
@@ -100,8 +99,7 @@ void blinkLED() {
 void runFans() {
   float voltage = getVoltage();
   int light = getLight();  // values between 0 and 1023
-  Serial.println(voltage);
-  
+
   switch (buttonState) {
     case 0:
       // Power fans depending on voltage and light.
