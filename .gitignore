@@ -1,2 +1,5 @@
 .DS_Store
 .eslintrc.json
+
+gradebook-export*.csv
+python/gradebook_explore
