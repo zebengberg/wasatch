@@ -28,7 +28,7 @@
 #define PR_PIN A0
 
 // Blinking speeds
-#define DELAY 500
+#define DELAY 200
 #define BAUDRATE 9600
 
 void setup() {
@@ -36,26 +36,38 @@ void setup() {
   pinMode(GREEN_PIN, OUTPUT);
   pinMode(BLUE_PIN, OUTPUT);
   pinMode(PR_PIN, INPUT);  // Assumes a 10k resistor to 5V with photo-resistor to GND
- 
+
+  delay(DELAY);
+  Serial.print("\n");
   Serial.begin(BAUDRATE);
-  Serial.println("Red\tGreen\tBlue");
+  Serial.print("magenta\tred\tyellow\tgreen\tcyan\tblue\twhite\n");
 }
 
 void loop() {
-  measurePR(RED_PIN);
-  measurePR(GREEN_PIN);
-  measurePR(BLUE_PIN);
+  measurePR(true, false, true);   // magenta
+  measurePR(true, false, false);  // red
+  measurePR(true, true, false);   // yellow
+  measurePR(false, true, false);  // green
+  measurePR(false, true, true);   // cyan
+  measurePR(false, false, true);  // blue
+  measurePR(true, true, true);    // white
+  Serial.print("\n");
 }
 
-void measurePR(int color) {
-  digitalWrite(color, HIGH);
+void measurePR(bool r, bool g, bool b) {
+  digitalWrite(RED_PIN, r);
+  digitalWrite(GREEN_PIN, g);
+  digitalWrite(BLUE_PIN, b);
   delay(DELAY);
+  
   int sensorValue = analogRead(PR_PIN);
   sensorValue = 1023 - sensorValue;
-  digitalWrite(color, LOW);
+
+  delay(DELAY);
+  digitalWrite(RED_PIN, LOW);
+  digitalWrite(GREEN_PIN, LOW);
+  digitalWrite(BLUE_PIN, LOW);
+  
   Serial.print(sensorValue);
   Serial.print("\t");
-  if (color == BLUE_PIN) {
-    Serial.print("\n");
-  }
 }
