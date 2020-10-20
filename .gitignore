@@ -1,5 +1,5 @@
 .DS_Store
 .eslintrc.json
+.vscode
 
-gradebook-export*.csv
-python/gradebook_explore
+*.csv

@@ -1,4 +1,4 @@
-# school-projects
+# wasatch
 
 Projects and simulations from Wasatch Academy engineering and computer science classes.
 
