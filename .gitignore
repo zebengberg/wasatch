@@ -1,5 +1,6 @@
 .DS_Store
 .eslintrc.json
 .vscode
-
+__pycache__
 *.csv
+saved_policies/

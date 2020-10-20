@@ -1,5 +1,4 @@
-"""An tf environment based on tutorial:
-https://www.tensorflow.org/agents/tutorials/2_environments_tutorial"""
+"""A tf environment based on: https://www.tensorflow.org/agents/tutorials/2_environments_tutorial"""
 
 
 import os
@@ -103,21 +102,25 @@ class LanceEnvironment(py_environment.PyEnvironment):
     if self._episode_ended:
       reward = self.score
       return ts.termination(self._state, reward)
-    return ts.transition(self._state, reward=0.0, discount=1.0)
+    return ts.transition(self._state, reward=self.score, discount=1.0)
 
   def collide_with_wall(self):
     """Determine if player collides with wall then reset position to stay in array."""
     if self.player[0] < 0:
       self.player = 0, self.player[1]
+      self.score -= 10
       self._episode_ended = True
     elif self.player[0] >= GAME_DIMENSION:
       self.player = GAME_DIMENSION - 1, self.player[1]
+      self.score -= 10
       self._episode_ended = True
     elif self.player[1] < 0:
       self.player = self.player[0], 0
+      self.score -= 10
       self._episode_ended = True
     elif self.player[1] >= GAME_DIMENSION:
       self.player = self.player[0], GAME_DIMENSION - 1
+      self.score -= 10
       self._episode_ended = True
 
   def eat_food(self):
@@ -142,7 +145,7 @@ def test_environment():
 
 
 def test_episodes(num_episodes=10):
-  """Test environment with random actions."""
+  """Test tf environment with random actions."""
   env = LanceEnvironment()
   tf_env = tf_py_environment.TFPyEnvironment(env)
   time_step = tf_env.reset()
