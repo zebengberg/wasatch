@@ -2,5 +2,11 @@
 .eslintrc.json
 .vscode
 __pycache__
-*.csv
+
+# checkpoints from lance's agent
 saved_policies/
+
+# data, images
+*.csv
+*.pdf
+*.png

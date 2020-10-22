@@ -85,10 +85,28 @@ def train_one_iteration():
     print(metric.result().numpy())
 
 
+def print_status():
+  pass
+
+
+def run():
+  pass
+
+
 for _ in range(2000):
   train_one_iteration()
 
-
 # policy saver
-# tf_policy_saver = policy_saver.PolicySaver(agent.policy)
-# tf_policy_saver.save('saved_policies')
+
+
+def save_policy():
+  tf_policy_saver = policy_saver.PolicySaver(agent.policy)
+  tf_policy_saver.save('saved_policies')
+
+
+def load_policy():
+  pass
+
+
+if __name__ == '__main__':
+  pass
