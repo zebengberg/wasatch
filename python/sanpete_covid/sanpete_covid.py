@@ -56,29 +56,6 @@ def load_data():
     return pdf_to_dates(f)
 
 
-def parse_text(text):
-  """Parse text for dates of reported Sanpete COVID cases."""
-  text = text.split('SANPETE')
-  text = text[1:]  # removing footer
-  dates = [item[2:12] for item in text]
-  dates = [date.split('/') for date in dates]
-
-  def parse_date_list(date):
-    if len(date) != 3:
-      return None
-    if len(date[0]) == 1:
-      date[0] = '0' + date[0]
-    if len(date[1]) == 1:
-      date[1] = '0' + date[1]
-    if len(date[2]) > 4:
-      date[2] = date[2][:4]
-    return date
-
-  dates = [parse_date_list(date) for date in dates]
-  dates = ['/'.join(date) for date in dates if date]
-  return dates
-
-
 def make_histogram(dates, save=True, recent_only=False):
   """Cast to pd.Series and plot histogram."""
   name = 'sanpete'
