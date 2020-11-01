@@ -50,7 +50,11 @@ def scrape_data_and_save():
 def pdf_to_dates(file):
   """Use tabula to parse PDF file to a list of dates."""
   print('Parsing PDF with tabula ...')
-  dfs = tabula.read_pdf(file, pages='all', options="--columns 100,200",
+  # pdf has dimensions 792 x 612
+  # read https://tabula-py.readthedocs.io/en/latest/faq.html#how-can-i-ignore-useless-area
+  # setting tabula java options
+  options = "--columns 120,240 --area 1,1,560,770"
+  dfs = tabula.read_pdf(file, pages='all', options=options,
                         guess=False, pandas_options={'header': None},)
   dates = []
   for df in dfs:
@@ -81,15 +85,14 @@ def load_data():
   data_path = get_local_data()
   if data_path is None:
     raise FileNotFoundError('Something wrong! Scraped data not found locally.')
-  else:
-    file_type = data_path.split('.')[-1]
-    with open(data_path, 'rb') as f:
-      if file_type == 'pdf':
-        return pdf_to_dates(f)
-      elif file_type == 'xlsx':
-        return excel_to_dates(f)
-      else:
-        raise NotImplementedError('Unknown file type of data.')
+  file_type = data_path.split('.')[-1]
+  with open(data_path, 'rb') as f:
+    if file_type == 'pdf':
+      return pdf_to_dates(f)
+    if file_type == 'xlsx':
+      return excel_to_dates(f)
+    else:
+      raise NotImplementedError('Unknown file type of data.')
 
 
 def make_histogram(dates, save=True, recent_only=False):

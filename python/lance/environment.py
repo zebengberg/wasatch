@@ -1,6 +1,5 @@
 """A tf environment based on: https://www.tensorflow.org/agents/tutorials/2_environments_tutorial"""
 
-
 import os
 from tqdm import tqdm
 import numpy as np
@@ -11,11 +10,11 @@ from tf_agents.environments import utils
 from tf_agents.environments import tf_py_environment
 from tf_agents.environments import py_environment
 
-# disabling tf warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+# suppress warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
-GAME_DIMENSION = 50
+GAME_DIMENSION = 6
 
 
 class LanceEnvironment(py_environment.PyEnvironment):
@@ -144,7 +143,7 @@ def test_environment():
   print('Test successful.')
 
 
-def test_episodes(num_episodes=10):
+def test_episodes(num_episodes=1000):
   """Test tf environment with random actions."""
   env = LanceEnvironment()
   tf_env = tf_py_environment.TFPyEnvironment(env)

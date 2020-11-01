@@ -3,11 +3,13 @@
 .vscode
 __pycache__
 
-# checkpoints from lance's agent
-saved_policies/
 
 # data, images
 *.csv
 *.pdf
 *.png
 *.xlsx
+*.docx
+
+# executables
+*.jar

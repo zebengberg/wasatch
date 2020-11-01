@@ -1,0 +1,925 @@
+{
+  "WEEK2": {
+    "SUNDAY": {
+      "BREAKFAST": [
+        "Brunch",
+        "Scrambled Eggs Potatoes O\u2019 Brian",
+        "Bacon/Sausage",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Sandwich",
+        "Fruit Blintzes",
+        "Chefs Choice"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "Teriyaki Chicken",
+        "Baked Potato Bar",
+        "Steamed Broccoli",
+        "Brown Rice",
+        "Corned Beef and Cabbage",
+        "Boiled Potatoes",
+        "Rice",
+        "Stuffed Portabellas",
+        "Germ .Choc Cake"
+      ]
+    },
+    "MONDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Cottage Fries",
+        "Turkey Sausage",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Eggs Benedict",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Mongolian Beef",
+        "Jasmine Rice",
+        "Asian Veggie",
+        "Potsticker",
+        "Spring Roll",
+        "Noodle",
+        "Deli Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Chicken Sandwich",
+        "Ranch Fried Tofu",
+        "French Fries/LTO",
+        "Saut\u00e9ed Yellow Squash",
+        "Rice",
+        "Meat Lasagna",
+        "Spinach Lasagna",
+        "Garlic Bread",
+        "Broccoli",
+        "Apple Pie"
+      ]
+    },
+    "TUESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Potatoes O Brian",
+        "Biscuits and Gravy",
+        "Hamburger Pattie",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Croissant",
+        "Rice Gruel",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Taco Salad",
+        "Taco Shells",
+        "Rice/Beans",
+        "Spinach And Shrooms",
+        "Noodle Bar",
+        "Deli Bar",
+        "Pizza Party"
+      ],
+      "DINNER": [
+        "Cajun Pasta",
+        "Corn Bread",
+        "Rice",
+        "Brussel Sprouts",
+        "Meatloaf",
+        "Garden Burger Loaf",
+        "Au Gratin Potatoes",
+        "Gravy",
+        "Fried Zucchini",
+        "Cheese Cake"
+      ]
+    },
+    "WEDNESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Hash Browns",
+        "Sausage Links",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Juevos Rancheros",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Sloppy Joes",
+        "Veggie Burger",
+        "Sweet Potato Fries",
+        "Spaghetti Squash",
+        "Rice",
+        "Grill Line",
+        "Noodle Bar",
+        "Deli Bar"
+      ],
+      "DINNER": [
+        "Chicken Coconut Curry",
+        "Veggie Coconut Curry",
+        "Basmati Rice",
+        "Naan/ Basmati Rice",
+        "Broccoli",
+        "Carve of the Day",
+        "Sauce /Veggies /Rolls",
+        "Rice or Potatoes",
+        "Cherry Pie",
+        "Cherry  Pie"
+      ]
+    },
+    "THURSDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Home Fries",
+        "Canadian Bacon",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Joes Scramble",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Anniversary Chicken",
+        "Grilled Eggplant",
+        "Brown Rice",
+        "Stuffed Portabella",
+        "Roasted red Potatoes",
+        "Rolls",
+        "Noodle Bar",
+        "Deli Bar",
+        "Pizza Bar"
+      ],
+      "DINNER": [
+        "Orange Chicken",
+        "Orange Tofu",
+        "Jasmine Rice",
+        "Fried Pot Stickers",
+        "Fresh Green Beans",
+        "Chicken/Broccoli",
+        "Casserole",
+        "Veg. casserole",
+        "Roasted Carrots",
+        "Rolls",
+        "Brownies"
+      ]
+    },
+    "FRIDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Batter Bites",
+        "Sausage Pattie",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Frittata",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Chicken Tenders",
+        "Corn Dogs",
+        "Giant  Pretzel",
+        "Fries/Rice",
+        "Garden Burgers",
+        "Braised Cabbage",
+        "Noodle Bar",
+        "Deli Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Chicken w/ Mustard & thyme",
+        "Rice/Rolls",
+        "Pesto tomatoes",
+        "Zucchini/Yellow Squash",
+        "Tostada Bar",
+        "Chicken/ Beef/ Veggie",
+        "Salsa Bar/ Shred Lett.",
+        "Corn Tortillas",
+        "Rice Krispie Treats",
+        "Yellow Cake"
+      ]
+    },
+    "SATURDAY": {
+      "BREAKFAST": [
+        "Brunch",
+        "Scrambled Eggs",
+        "Tater Tots",
+        "Sausage/Bacon",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar                Joes Scramble",
+        "Breakfast Croissant",
+        "Chefs Choice"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "BBQ Chicken",
+        "Biscuits/Honey Butter",
+        "Baked Potato Bar",
+        "Stuffed Portabella",
+        "Rice/Corn",
+        "Fettuccini Alfredo",
+        "Tortellini",
+        "Crab Cakes",
+        "Steamed Carrots",
+        "Lemon Meringue Pie"
+      ]
+    }
+  },
+  "WEEK5": {
+    "SUNDAY": {
+      "BREAKFAST": [
+        "Brunch",
+        "Scrambled Eggs Potatoes O\u2019 Brian",
+        "Bacon/Sausage",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Sandwich",
+        "Fruit Blintzes",
+        "Chefs Choice"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "Beef Ravioli",
+        "Cheese Raviloli",
+        "Marinara/Alfredo",
+        "Veggie",
+        "Bread Sticks",
+        "Teriyaki Chic Sand",
+        "Asian Veggies",
+        "Tofu/Rice",
+        "Eggrolls"
+      ]
+    },
+    "MONDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Cottage Fries",
+        "Turkey Sausage",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Eggs Benedict",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Flank Steak",
+        "Baked Potato Bar",
+        "Gravy",
+        "Roll/Rice",
+        "Brussel Sprouts",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Burger Night",
+        "Hamburgers",
+        "Hotdogs",
+        "Veggie Burgers",
+        "Buns/LTO",
+        "Rice Pilaf/Veggie",
+        "Korean Beef Cubes",
+        "Rice/Potstickers",
+        "BokChoy&Mushroom",
+        "Fried Tofu"
+      ]
+    },
+    "TUESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Potatoes O Brian",
+        "Biscuits and Gravy",
+        "Hamburger Pattie",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Croissant",
+        "Rice Gruel",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Macho Nacho",
+        "Ground Beef",
+        "Diced Chicken",
+        "Spanish Rice/Beans",
+        "Cheese Sauce",
+        "Veggie",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Pizza Party"
+      ],
+      "DINNER": [
+        "Malibu Chicken",
+        "Pesto Tomatoes",
+        "Au Gratin Potatoes",
+        "Rice",
+        "Veggie",
+        "Mac & Cheese Variety Station"
+      ]
+    },
+    "WEDNESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Hash Browns",
+        "Sausage Links",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Juevos Rancheros",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Beef Brisket",
+        "Mashed Potatoes",
+        "Gravy/Rice",
+        "Rolls",
+        "Veggie",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Beef Stroganoff",
+        "Egg Noodle",
+        "Rice",
+        "Steamed Broccoli",
+        "Carve of the Day",
+        "Sauce /Veggies /Rolls",
+        "Rice or Potatoes",
+        "Turkey"
+      ]
+    },
+    "THURSDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Home Fries",
+        "Canadian Bacon",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Joes Scramble",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Tangy Pork Sandwiches",
+        "Veggie Burgers",
+        "Fried Mushrooms",
+        "Veggie",
+        "Fried Tofu",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Shredded Beef Tacos",
+        "Tortillas/Soft/Hard",
+        "Spanish Rice",
+        "Black Beans",
+        "Veggie",
+        "Pork Chops",
+        "gravy",
+        "Rach Noodles",
+        "Rice/Rolls",
+        "Veggie"
+      ]
+    },
+    "FRIDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Batter Bites",
+        "Sausage Pattie",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Frittata",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Buffalo Salmon",
+        "Rice",
+        "Carrots",
+        "Baked Portabellas",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Chicken Cacciatore",
+        "Veggie Cacciatore",
+        "Rice/Veggie",
+        "Portabellas",
+        "Navajo Tacos",
+        "Fried Scones",
+        "Chili/Veg Chili",
+        "Rice/Broccoli",
+        "Salsa Bar"
+      ]
+    },
+    "SATURDAY": {
+      "BREAKFAST": [
+        "Brunch",
+        "Scrambled Eggs",
+        "Tater Tots",
+        "Sausage/Bacon",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar                Joes Scramble",
+        "Breakfast Croissant",
+        "Chefs Choice"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "8 Pc Szechuan Chicken",
+        "Asian Veggies",
+        "Eggrolls",
+        "Tofu/Rice",
+        "Chicken Strips",
+        "Twister Fries",
+        "Veggie/Rice",
+        "Stuffed Peppers"
+      ]
+    }
+  },
+  "WEEK6": {
+    "SUNDAY": {
+      "BREAKFAST": [
+        "Brunch",
+        "Scrambled Eggs Potatoes O\u2019 Brian",
+        "Bacon/Sausage",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Sandwich",
+        "Fruit Blintzes",
+        "Chefs Choice"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "Sweet & Sour Beef",
+        "Rice",
+        "Veggie",
+        "Eggroll",
+        "Tofu",
+        "Chicken Sandwich",
+        "Sweet Potato Fries",
+        "Pasta Primavera",
+        "Steamed Broccoli"
+      ]
+    },
+    "MONDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Cottage Fries",
+        "Turkey Sausage",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Eggs Benedict",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Chicken BLT Wrap",
+        "Tortilla",
+        "Spinach Wrap",
+        "Rice",
+        "Veggie",
+        "LTO",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Chicken Parmesan",
+        "Spaghetti Noodle",
+        "Pepper Marinara",
+        "Spaghetti Squash",
+        "Baguette",
+        "Pork Stew",
+        "Jaz Rice",
+        "Rolls",
+        "Swiss Chard",
+        "Stuffed Peppers"
+      ]
+    },
+    "TUESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Potatoes O Brian",
+        "Biscuits and Gravy",
+        "Hamburger Pattie",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Croissant",
+        "Rice Gruel",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Sausage & Sweet pepper",
+        "Bow Tie Pasta",
+        "Jaz Rice/Rolls",
+        "Stuffed Tomato",
+        "Braised Kale",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Pizza Party"
+      ],
+      "DINNER": [
+        "Asian Roast Beef Tip",
+        "Asian Veggies",
+        "Jaz Rice",
+        "Eggrolls",
+        "Potsticker",
+        "Panini Station Build Your Own Panini"
+      ]
+    },
+    "WEDNESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Hash Browns",
+        "Sausage Links",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Juevos Rancheros",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Baked Chicken",
+        "Mashed Potatoes",
+        "Gravy",
+        "Rolls/Rice",
+        "Acorn Squash",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Broccoli Ham Stroganoff",
+        "Veggie/Stroganoff",
+        "Egg Noodles",
+        "Rice/Veggie",
+        "Carve of the Day",
+        "Sauce /Veggies /Rolls",
+        "Rice or Potatoes"
+      ]
+    },
+    "THURSDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Home Fries",
+        "Canadian Bacon",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Joes Scramble",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Philly Cheese Steak",
+        "Veggie Burger",
+        "Onion Rings",
+        "Rice",
+        "Cheese Sauce",
+        "Roasted Cauliflower",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "South West Chicken",
+        "South West Rice",
+        "Tortillas",
+        "Sunburst Squash",
+        "Swiss New York/ Steak",
+        "Tomato Gravy",
+        "Mashed Potatoes",
+        "Rice",
+        "Veggie"
+      ]
+    },
+    "FRIDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Batter Bites",
+        "Sausage Pattie",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Frittata",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "BBQ Ribs",
+        "Boiled Potatoes",
+        "Cabbage",
+        "Gravy",
+        "Pesto Pasta",
+        "Noodle Bar",
+        "Deli Bar",
+        "Salad Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Salmon W/ Balsamic Glaze",
+        "RoastedBroccoli&Garlic",
+        "Rice/Gravy",
+        "Smashed Potatoes W/ Onions",
+        "8 Pc Italian Chicken",
+        "Au Gratins",
+        "Spinach",
+        "Stuffed Portabella"
+      ]
+    },
+    "SATURDAY": {
+      "BREAKFAST": [
+        "Brunch",
+        "Scrambled Eggs",
+        "Tater Tots",
+        "Sausage/Bacon",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar                Joes Scramble",
+        "Breakfast Croissant",
+        "Chefs Choice"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "Orange Chicken",
+        "Orange Tofu",
+        "Asian Veggies",
+        "Jaz Rice",
+        "Spring Rolls",
+        "Roast Beef/Gravy",
+        "Mashed Potatoes",
+        "Veggie",
+        "Rolls/Rice"
+      ]
+    }
+  },
+  "WEEK1": {
+    "SUNDAY": {
+      "BREAKFAST": [
+        "Scrambled Eggs",
+        "Potatoes O\u2019 Brian",
+        "Bacon/Sausage",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Sandwich",
+        "Fruit Blintzes",
+        "Chefs choice",
+        "Fruitm"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "Chili Dog Bar",
+        "Tomato/Onions/",
+        "Cheese",
+        "Chili/Veg. Chili",
+        "Salisbury Steak",
+        "Egg Noodles",
+        "Butternut Squash",
+        "Rice",
+        "Cookies"
+      ]
+    },
+    "MONDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Cottage Fries",
+        "Turkey Sausage Patty",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Eggs Benedict",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Fried Chicken",
+        "Fried Tofu",
+        "Fries",
+        "Buns/LTO",
+        "Veggie Burger",
+        "Rice",
+        "Saut\u00e9ed Green Beans",
+        "Noodle Bar",
+        "Deli Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "NY  Steak",
+        "Grilled Portabella",
+        "Baked Potato Bar",
+        "Rice/Ciabatta",
+        "Roasted Asparagus",
+        "Teriyaki Chicken",
+        "Yakisoba noodle",
+        "Asian Veggie",
+        "Rice/Spring Rolls",
+        "Cherry Pie"
+      ]
+    },
+    "TUESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Potatoes O\u2019 Brian",
+        "Biscuits and Gravy",
+        "Hamburger Patty",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Croissant",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Taco Tuesday",
+        "Seasoned Ground Beef",
+        "Spanish Rice/Tamales",
+        "Refried/Black Bean",
+        "Brown Broccoli & Roasted Garlic",
+        "Salsa Bar",
+        "Noodle Bar",
+        "Deli Bar",
+        "Pizza Party"
+      ],
+      "DINNER": [
+        "Fresh Pasta Bar",
+        "Penne",
+        "Alfredo/Marinara",
+        "Tomato/Basil/Pesto",
+        "Parmesan/G-Bread",
+        "Panini Station",
+        "Build your own panini",
+        "Chocolate Cake"
+      ]
+    },
+    "WEDNESDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Hash Browns",
+        "Link  Sausage",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Juevos Rancheros",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "French Dip Sand",
+        "Onion rings",
+        "Grilled Swiss & Tomato on Rye",
+        "Rice",
+        "Baked Acorn Squash",
+        "Noodle Bar",
+        "Deli Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Chicken Gumbo",
+        "Corn Bread",
+        "Basmati Rice",
+        "Brussel Sprouts",
+        "Carving Corner/Gravy",
+        "Veggies/Rice /",
+        "Rolls",
+        "Baked Potato Bar",
+        "Chocolate Mousse"
+      ]
+    },
+    "THURSDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Home Fries",
+        "Canadian Bacon",
+        "Biscuits and Gravy",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Joes Scramble",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Enchilada",
+        "Chicken/Cheese",
+        "Spanish Rice",
+        "Salsa Bar",
+        "Butter Nut Squash",
+        "Southwest Eggrolls",
+        "Noodle Bar",
+        "Deli Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Rosemary  Garlic Roast Burgundy",
+        "Pork",
+        "Sweet Potato",
+        "Corn & Black Beans",
+        "Rice",
+        "Tuscan Chicken",
+        "Fettucini",
+        "Rice/Spinach",
+        "Stuffed Portabella",
+        "Chocolate Cream Pie"
+      ]
+    },
+    "FRIDAY": {
+      "BREAKFAST": [
+        "Omelet Bar",
+        "Scrambled Eggs",
+        "Batter Bites          Sausage Patty",
+        "Biscuits and Gravy",
+        "Pancakes",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Frittata",
+        "Hot Cereal"
+      ],
+      "LUNCH": [
+        "Poached Salmon w/",
+        "Hollandaise",
+        "Stuffed Peppers",
+        "Bow Tie Pasta Sundried Tomato Pesto w/ olives",
+        "Rice",
+        "Steamed Broccoli",
+        "Noodle Bar",
+        "Deli Bar",
+        "Grill Line"
+      ],
+      "DINNER": [
+        "Roast Lemon Herb Chicken w/Gravy",
+        "Fingerling Potatoes/Rice",
+        "Saut\u00e9ed Zucchini",
+        "Fish Tacos/Flour/Corn",
+        "Spanish Rice/Beans",
+        "Mango Salsa Bar",
+        "Cheese Cake"
+      ]
+    },
+    "SATURDAY": {
+      "BREAKFAST": [
+        "Scrambled Eggs",
+        "Tater Tots",
+        "Sausage/Bacon",
+        "French Toast",
+        "Hard Boiled Eggs",
+        "Waffle Bar",
+        "Breakfast Croissant",
+        "Joes Scramble",
+        "Chefs Choice"
+      ],
+      "LUNCH": [],
+      "DINNER": [
+        "Flank Steak",
+        "Mashed Potatoes",
+        "Gravy",
+        "Steamed Green Beans",
+        "Spaghetti w/ Meat Sauce",
+        "Bread Sticks",
+        "Tortellini Alfredo",
+        "Peas & Pearl Onions",
+        "Carrot Cake"
+      ]
+    }
+  }
+}
